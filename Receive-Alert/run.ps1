@@ -693,9 +693,9 @@ if ($Alert) {
             2. MSO tags for Desktop Windows Outlook enforce a 680px width.
             Note: The Fluid and Responsive templates have a different width (600px). The hybrid grid is more "fragile", and I've found that 680px is a good width. Change with caution.
         -->
-        <div style="max-width: 680px; margin: 0 auto;" class="email-container">
+        <div style="max-width: 1800px; margin: 0 auto;" class="email-container">
             <!--[if mso]>
-            <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="680">
+            <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="1800px">
             <tr>
             <td>
             <![endif]-->
