@@ -12,7 +12,9 @@
 # Authenticate with Azure PowerShell using MSI.
 # Remove this if you are not planning on using MSI or Azure PowerShell.
 
-import-module .\DRMMHelper.psm1
+foreach($file in Get-ChildItem -Path "$PSScriptRoot\Modules" -Filter *.psm1){
+    Import-Module $file.fullname
+}
 import-module DattoRMM
 Import-Module HaloAPI
 

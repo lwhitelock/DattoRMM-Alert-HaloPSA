@@ -16,11 +16,10 @@ Once you have created the custom field we need to create two custom reports in H
 
 ##### DattoRMMAlerts:
 ```
-/****** Script for SelectTopNRows command from SSMS  ******/
 SELECT TOP (1000) [Faultid]
       ,[Symptom]
       ,[tstatusdesc]
-      ,[datereported]
+      ,[dateoccured]
       ,[inventorynumber]
       ,[FGFIAlertType]
       ,[CFDattoAlertType]
