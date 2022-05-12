@@ -5,15 +5,25 @@ param($Request, $TriggerMetadata)
 
 Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
 
-$DattoURL = $env:DattoURL
-$DattoKey = $env:DattoKey
-$DattoSecretKey = $env:DattoSecretKey
+#$DattoURL = $env:DattoURL
+#$DattoKey = $env:DattoKey
+#$DattoSecretKey = $env:DattoSecretKey
 
-$HaloClientID = $env:HaloClientID
-$HaloClientSecret = $env:HaloClientSecret
-$HaloURL = $env:HaloURL
+#$HaloClientID = $env:HaloClientID
+#$HaloClientSecret = $env:HaloClientSecret
+#$HaloURL = $env:HaloURL
 
-$NumberOfColumns = 2
+$VaultName = "IQinIT-KV"
+$HaloClientID = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloClientID" -AsPlainText
+$HaloClientSecret = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloClientSecret" -AsPlainText
+$HaloURL = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloURL" -AsPlainText
+
+$DattoURL = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoURL" -AsPlainText
+$DattoKey = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoKey" -AsPlainText
+$DattoSecretKey = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoSecretKey" -AsPlainText 
+
+
+$NumberOfColumns = 3
 $HaloTicketStatusID = 2
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
@@ -127,21 +137,28 @@ if ($Alert) {
         reportingperiod = "7"
     }
 
-    $ReportResults = Set-HaloReport -Report $AlertReportFilter
+    $ReportResults = (Set-HaloReport -Report $AlertReportFilter).report.rows
 
-    # Generate Email Subject
+    $ReoccuringHistory = $ReportResults | where-object {$_.CFDattoAlertType -eq $ParsedAlertType} 
+    
+    $ReoccuringAlerts = $ReoccuringHistory | where-object {$_.dateoccured -gt ((Get-Date).addhours(-$ReoccurringTicketHours)) }
 
+    $RelatedAlerts = $ReportResults | where-object {$_.dateoccured -gt ((Get-Date).addminutes(-$RelatedAlertMinutes))}
+    
+
+
+    # Build the alert details section
     Get-DRMMAlertDetailsSection -Sections $Sections -Alert $Alert -Device $Device -AlertDocumentationURL $AlertDocumentationURL -AlertTroubleshooting $AlertTroubleshooting -DattoPlatform $DattoPlatform
 
 
     ## Build the device details section if enabled.
-    #if ($ShowDeviceDetails -eq $True) {
-    #    Get-DRMMDeviceDetailsSection -Sections $Sections -Device $Device
-    #}
+    if ($ShowDeviceDetails -eq $True) {
+        Get-DRMMDeviceDetailsSection -Sections $Sections -Device $Device
+    }
 
 
     # Build the device status section if enabled
-    if ($ShowDeviceStatus) {
+    if ($ShowDeviceStatus -eq $true) {
         Get-DRMMDeviceStatusSection -Sections $Sections -Device $Device -DeviceAudit $DeviceAudit -CPUUDF $CPUUDF -RAMUDF $RAMUDF
     }
 
