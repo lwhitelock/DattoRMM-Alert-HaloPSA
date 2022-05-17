@@ -43,7 +43,7 @@ SELECT TOP (1000) [Faultid]
 ### Webhook
 ```
 {
-    "alertTroubleshooting": "Please run scandisk and then consult the documentation with the view docs link",
+    "troubleshootingNote": "Please run scandisk and then consult the documentation with the view docs link",
     "docURL": "https://docs.yourdomain.com/alert-specific-kb-article",
     "showDeviceDetails": true,
     "showDeviceStatus": true,
