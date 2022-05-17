@@ -327,6 +327,7 @@ function Get-DRMMAlertHistorySection {
     $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
 
     $ParsedOpenAlerts = $DeviceOpenAlerts | ForEach-Object {
+        Write-Host "Timestamp: $($_.timestamp)"
         [PSCustomObject]@{
             View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
             Priority    = $_.priority
