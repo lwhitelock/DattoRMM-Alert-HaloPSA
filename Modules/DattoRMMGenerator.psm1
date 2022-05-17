@@ -329,12 +329,13 @@ function Get-DRMMAlertHistorySection {
 
     [System.Collections.Generic.List[PSCustomObject]]$ParsedOpenAlerts = @()
     $DeviceOpenAlerts | ForEach-Object {
+        $ProcessingAlert = $_
         $Return = @{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $_.priority
-            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp))
-            Type        = $AlertTypesLookup[$_.alertContext.'@class']
-            Description = Get-AlertDescription -Alert $_
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($ProcessingAlert.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $ProcessingAlert.priority
+            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($ProcessingAlert.timestamp))
+            Type        = $AlertTypesLookup[$ProcessingAlert.alertContext.'@class']
+            Description = Get-AlertDescription -Alert $ProcessingAlert
         }
         $ParsedOpenAlerts.add($Return)
     }
@@ -344,12 +345,13 @@ function Get-DRMMAlertHistorySection {
 
     [System.Collections.Generic.List[PSCustomObject]]$ParsedResolvedAlerts = @()
     $DeviceResolvedAlerts | ForEach-Object { 
+        $ProcessingAlert = $_
         $Return = @{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $_.priority
-            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp))
-            Type        = $AlertTypesLookup[$_.alertContext.'@class']
-            Description = Get-AlertDescription -Alert $_
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($ProcessingAlert.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $ProcessingAlert.priority
+            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($ProcessingAlert.timestamp))
+            Type        = $AlertTypesLookup[$ProcessingAlert.alertContext.'@class']
+            Description = Get-AlertDescription -Alert $ProcessingAlert
         }
         $ParsedResolvedAlerts.add($Return)
     }
