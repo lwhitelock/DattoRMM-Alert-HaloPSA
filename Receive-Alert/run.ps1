@@ -167,8 +167,6 @@ if ($Alert) {
 
     $HTMLBody = Get-HTMLBody -Sections $Sections -NumberOfColumns $NumberOfColumns
 
-    $HTMLBody | out-file c:\temp\HaloTest.html
-
     $HaloPriority = $PriorityHaloMap."$($Alert.Priority)"
 
     $HaloTicketCreate = @{
