@@ -326,41 +326,32 @@ function Get-DRMMAlertHistorySection {
 
     $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
 
-    $ParsedOpenAlerts = $DeviceOpenAlerts | ForEach-Object {
-        Write-Host "$($_ | convertto-json -depth 100 | out-string)"
-        $Timestamp = $_.timestamp
-        $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
-        $AlertUID = $_.alertUid
-        $URL = "https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)"
-        $Priority = $_.priority
-        $AlertContext = $_.alertContext
-        [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"$URL`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $Priority
-            Created     = $Time
-            Type        = $AlertTypesLookup[$AlertContext.'@class']
+
+    [System.Collections.Generic.List[PSCustomObject]]$ParsedOpenAlerts = @()
+    $DeviceOpenAlerts | ForEach-Object {
+        $Return = @{
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $_.priority
+            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp))
+            Type        = $AlertTypesLookup[$_.alertContext.'@class']
             Description = Get-AlertDescription -Alert $_
         }
+        $ParsedOpenAlerts.add($Return)
     }
 
     $HTMLOpenAlerts = $ParsedOpenAlerts | convertto-html -Fragment
     $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
 
-    $ParsedResolvedAlerts = $DeviceResolvedAlerts | ForEach-Object {
-        Write-Host "$($_ | convertto-json -depth 100 | out-string)"
-        $Timestamp = $_.timestamp
-        $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
-        $AlertUID = $_.alertUid
-        $URL = "https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)"
-        $Priority = $_.priority
-        $AlertContext = $_.alertContext
-        [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"$URL`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $Priority
-            Created     = $Time
-            Type        = $AlertTypesLookup[$AlertContext.'@class']
+    [System.Collections.Generic.List[PSCustomObject]]$ParsedResolvedAlerts = @()
+    $DeviceResolvedAlerts | ForEach-Object { 
+        $Return = @{
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $_.priority
+            Created     = $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp))
+            Type        = $AlertTypesLookup[$_.alertContext.'@class']
             Description = Get-AlertDescription -Alert $_
         }
+        $ParsedResolvedAlerts.add($Return)
     }
 
     $HTMLResolvedAlerts = $ParsedResolvedAlerts | Sort-Object Created -desc | select-object -first 10 | convertto-html -Fragment
