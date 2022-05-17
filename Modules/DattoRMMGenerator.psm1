@@ -327,6 +327,7 @@ function Get-DRMMAlertHistorySection {
     $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
 
     $ParsedOpenAlerts = $DeviceOpenAlerts | ForEach-Object {
+        Write-Host "$($_ | converto-json -depth 100 | out-string)"
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
         $AlertUID = $_.alertUid
@@ -345,6 +346,7 @@ function Get-DRMMAlertHistorySection {
     $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
 
     $ParsedResolvedAlerts = $DeviceResolvedAlerts | ForEach-Object {
+        Write-Host "$($_ | converto-json -depth 100 | out-string)"
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
         $AlertUID = $_.alertUid
