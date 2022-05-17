@@ -5,6 +5,8 @@ param($Request, $TriggerMetadata)
 
 Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
 
+Write-Host "Public IP: $((Invoke-WebRequest -uri "http://ifconfig.me/ip").Content)"
+
 $DattoURL = $env:DattoURL
 $DattoKey = $env:DattoKey
 $DattoSecretKey = $env:DattoSecretKey
