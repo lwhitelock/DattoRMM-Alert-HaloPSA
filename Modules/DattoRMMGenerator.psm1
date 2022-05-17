@@ -331,10 +331,11 @@ function Get-DRMMAlertHistorySection {
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
         $AlertUID = $_.alertUid
+        $URL = "https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)"
         $Priority = $_.priority
         $AlertContext = $_.alertContext
         [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"$URL`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
             Priority    = $Priority
             Created     = $Time
             Type        = $AlertTypesLookup[$AlertContext.'@class']
@@ -350,10 +351,11 @@ function Get-DRMMAlertHistorySection {
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
         $AlertUID = $_.alertUid
+        $URL = "https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)"
         $Priority = $_.priority
         $AlertContext = $_.alertContext
         [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"$URL`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
             Priority    = $Priority
             Created     = $Time
             Type        = $AlertTypesLookup[$AlertContext.'@class']
