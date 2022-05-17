@@ -25,6 +25,8 @@ $DattoSecretKey = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoSecretK
 
 $NumberOfColumns = 3
 $HaloTicketStatusID = 2
+$SetTicketResponded = $True
+
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 5
@@ -122,28 +124,28 @@ if ($Alert) {
     $ParsedAlertType = Get-AlertHaloType -Alert $Alert -AlertMessage $AlertMessage
 
     $AlertReportFilter = @{
-        id = $HaloDattoRMMAlerts
-        filters = @(
+        id                       = $HaloDattoRMMAlerts
+        filters                  = @(
             @{
-                fieldname = 'inventorynumber'
+                fieldname      = 'inventorynumber'
                 stringruletype = 2
                 stringruletext = "$($HaloDevice.did)"
             }
         )
-        _loadreportonly = $true
+        _loadreportonly          = $true
         reportingperiodstartdate = get-date(((Get-date).ToUniversalTime()).adddays(-$HaloAlertHistoryDays)) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
-        reportingperiodenddate =  get-date((Get-date -Hour 23 -Minute 59 -second 59).ToUniversalTime()) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
+        reportingperiodenddate   = get-date((Get-date -Hour 23 -Minute 59 -second 59).ToUniversalTime()) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
         reportingperioddatefield = "dateoccured"
-        reportingperiod = "7"
+        reportingperiod          = "7"
     }
 
     $ReportResults = (Set-HaloReport -Report $AlertReportFilter).report.rows
 
-    $ReoccuringHistory = $ReportResults | where-object {$_.CFDattoAlertType -eq $ParsedAlertType} 
+    $ReoccuringHistory = $ReportResults | where-object { $_.CFDattoAlertType -eq $ParsedAlertType } 
     
-    $ReoccuringAlerts = $ReoccuringHistory | where-object {$_.dateoccured -gt ((Get-Date).addhours(-$ReoccurringTicketHours)) }
+    $ReoccuringAlerts = $ReoccuringHistory | where-object { $_.dateoccured -gt ((Get-Date).addhours(-$ReoccurringTicketHours)) }
 
-    $RelatedAlerts = $ReportResults | where-object {$_.dateoccured -gt ((Get-Date).addminutes(-$RelatedAlertMinutes))}
+    $RelatedAlerts = $ReportResults | where-object { $_.dateoccured -gt ((Get-Date).addminutes(-$RelatedAlertMinutes)).ToUniversalTime() -and $_.CFDattoAlertType -ne $ParsedAlertType }
     
 
 
@@ -175,7 +177,6 @@ if ($Alert) {
 
     $HaloPriority = $PriorityHaloMap."$($Alert.Priority)"
 
-
     $HaloTicketCreate = @{
         summary          = $TicketSubject
         tickettype_id    = $HaloTicketType
@@ -186,23 +187,78 @@ if ($Alert) {
         assets           = @(@{id = $HaloDevice.did })
         priority_id      = $HaloPriority
         status_id        = $HaloTicketStatusID
-        customfields = @(
+        customfields     = @(
             @{
-                id = $HaloCustomAlertTypeField
+                id    = $HaloCustomAlertTypeField
                 value = $ParsedAlertType
             }
         )
     }
 
+
+    # Handle reoccurring alerts
+    if ($ReoccuringAlerts) {
+        # Child Tickets [{"id":40935,"parent_id":"40936"},{"id":40934,"parent_id":"40936"},{"id":40279,"parent_id":"40936"}]
+        
+        $ReoccuringAlertParent = $ReoccuringAlerts | Sort-Object FaultID | Select-Object -First 1
+                
+        if ($ReoccuringAlertParent.ParentID) {
+            $ParentID = $ReoccuringAlertParent.ParentID
+        } else {
+            $ParentID = $ReoccuringAlertParent.FaultID
+        }
+
+        #[{"id":"40936","files":null,"status_id":"2","attachments":[],"utcoffset":-60,"_refreshresponse":true,"apply_rules":true}]
+        
+        
+        $RecurringUpdate = @{
+            id = $ParentID
+            status_id = $HaloReocurringStatus   
+        }
+
+        $null = Set-HaloTicket -Ticket $RecurringUpdate
+
+        $HaloTicketCreate.add('parent_id', $ParentID)
+        
+    } elseif ($RelatedAlerts) {
+        # Relate to another ticket [{"id":"40936","_refreshresponse":true,"createdfrom_id":40934}]
+        $RelatedAlertsParent = $RelatedAlerts | Sort-Object FaultID | Select-Object -First 1
+
+        if ($RelatedAlertsParent.RelatedID -ne 0) {
+            $CreatedFromID = $RelatedAlertsParent.RelatedID
+        } else {
+            $CreatedFromID = $RelatedAlertsParent.FaultID
+        }
+        
+        $HaloTicketCreate.add('createdfrom_id', $CreatedFromID)
+
+    } 
+
+
+     
     $Ticket = New-HaloTicket -Ticket $HaloTicketCreate
 
+    # [{"ticket_id":"40942","action_isresponse":true,"validate_response":true,"sendemail":false,"_forcereassign":true,"_includeticketinresponse":true}
+
     $ActionUpdate = @{
-        id        = 1
-        ticket_id = $Ticket.id
-        important = $true
+        id                = 1
+        ticket_id         = $Ticket.id
+        important         = $true
+        action_isresponse = $true      
     }
 
-    $Action = Set-HaloAction -Action $ActionUpdate
+    $Null = Set-HaloAction -Action $ActionUpdate
+
+    if ($SetTicketResponded -eq $true) {
+        $ActionResolveUpdate = @{
+            ticket_id         = $Ticket.id
+            action_isresponse = $true
+            validate_response = $True
+            sendemail         = $false
+        }
+        $Null = New-HaloAction -Action $ActionResolveUpdate
+    }
+    
 
 } else {
     Write-Host "No alert found"

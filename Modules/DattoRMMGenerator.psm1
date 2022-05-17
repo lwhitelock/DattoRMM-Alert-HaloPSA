@@ -72,14 +72,7 @@ function Get-DRMMAlertDetailsSection {
                                             <li>Device name: <strong>$($Device.hostname)</strong></li>
                                             <li>Site: <strong>$($Device.siteName)</strong></li>
                                             <li>User: <strong>$($Device.lastLoggedInUser)</strong></li>
-    
-                                        </ul>
-                                    </td>
-                                    <td style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff; padding-top: 10px;"
-                                        class="stack-column-center">
-                                        <ul>
-                                            <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00';
-                                                    $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
+                                            <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
                                             <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>
                                             <li>External IP: <strong>$($Device.extIpAddress)</strong></li>
                                         </ul>
