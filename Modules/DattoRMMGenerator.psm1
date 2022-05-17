@@ -329,11 +329,14 @@ function Get-DRMMAlertHistorySection {
     $ParsedOpenAlerts = $DeviceOpenAlerts | ForEach-Object {
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
+        $AlertUID = $_.alertUid
+        $Priority = $_.priority
+        $AlertContext = $_.alertContext
         [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $_.priority
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $Priority
             Created     = $Time
-            Type        = $AlertTypesLookup[$_.alertContext.'@class']
+            Type        = $AlertTypesLookup[$AlertContext.'@class']
             Description = Get-AlertDescription -Alert $_
         }
     }
@@ -344,11 +347,14 @@ function Get-DRMMAlertHistorySection {
     $ParsedResolvedAlerts = $DeviceResolvedAlerts | ForEach-Object {
         $Timestamp = $_.timestamp
         $Time = $((Get-Date 01.01.1970).AddMilliSeconds($Timestamp))
+        $AlertUID = $_.alertUid
+        $Priority = $_.priority
+        $AlertContext = $_.alertContext
         [PSCustomObject]@{
-            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
-            Priority    = $_.priority
+            View        = "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($AlertUID)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>"
+            Priority    = $Priority
             Created     = $Time
-            Type        = $AlertTypesLookup[$_.alertContext.'@class']
+            Type        = $AlertTypesLookup[$AlertContext.'@class']
             Description = Get-AlertDescription -Alert $_
         }
     }
