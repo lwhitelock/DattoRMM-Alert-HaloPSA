@@ -5,23 +5,13 @@ param($Request, $TriggerMetadata)
 
 Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
 
-#$DattoURL = $env:DattoURL
-#$DattoKey = $env:DattoKey
-#$DattoSecretKey = $env:DattoSecretKey
+$DattoURL = $env:DattoURL
+$DattoKey = $env:DattoKey
+$DattoSecretKey = $env:DattoSecretKey
 
-#$HaloClientID = $env:HaloClientID
-#$HaloClientSecret = $env:HaloClientSecret
-#$HaloURL = $env:HaloURL
-
-$VaultName = "IQinIT-KV"
-$HaloClientID = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloClientID" -AsPlainText
-$HaloClientSecret = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloClientSecret" -AsPlainText
-$HaloURL = Get-AzKeyVaultSecret -VaultName $VaultName -Name "HaloURL" -AsPlainText
-
-$DattoURL = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoURL" -AsPlainText
-$DattoKey = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoKey" -AsPlainText
-$DattoSecretKey = Get-AzKeyVaultSecret -VaultName $VaultName -Name "DattoSecretKey" -AsPlainText 
-
+$HaloClientID = $env:HaloClientID
+$HaloClientSecret = $env:HaloClientSecret
+$HaloURL = $env:HaloURL
 
 $NumberOfColumns = 3
 $HaloTicketStatusID = 2
@@ -38,21 +28,23 @@ $HaloReocurringStatus = 35
 
 $HaloAlertHistoryDays = 90
 
-#$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
-#$HaloDattoRMMDeviceLookup = $env:HaloDattoRMMDeviceLookup
-#$HaloDattoRMMAlerts = $env:HaloDattoRMMAlerts
-#$HaloTicketType = $env:HaloTicketType
+#$HaloCustomAlertTypeField = 252
+#$HaloDattoRMMDeviceLookup = 222
+#$HaloDattoRMMAlerts = 221
+#$HaloTicketType = 24
 
-$HaloCustomAlertTypeField = 252
-$HaloDattoRMMDeviceLookup = 222
-$HaloDattoRMMAlerts = 221
-$HaloTicketType = 24
+$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
+$HaloDattoRMMDeviceLookup = $env:HaloDattoRMMDeviceLookup
+$HaloDattoRMMAlerts = $env:HaloDattoRMMAlerts
+$HaloTicketType = $env:HaloTicketType
 
-#$CPUUDF = $env:CPUUDF
-#$RAMUDF = $env:RAMUDF
+#$CPUUDF = '29'
+#$RAMUDF = '30'
 
-$CPUUDF = '29'
-$RAMUDF = '30'
+$CPUUDF = $env:CPUUDF
+$RAMUDF = $env:RAMUDF
+
+
 
 $PriorityHaloMap = @{
     "Critical"    = "1"
@@ -63,25 +55,27 @@ $PriorityHaloMap = @{
 }
 
 
+#$AlertTroubleshooting = 'Example Note'
+#$AlertDocumentationURL = 'https://docs.example.com'
+#$ShowDeviceDetails = $true
+#$ShowDeviceStatus = $true
+#$ShowAlertDetails = $true
+#$AlertID = 'e01e5dbb-6bc4-427c-b1f6-4106797af0ad'
+#$AlertMessage = '[Failure Test Monitor] - Result: A Test Alert Was Created'
+#$DattoPlatform = 'merlot'
+
 $AlertWebhook = $Request.Body
 
-#$AlertTroubleshooting = $AlertWebhook.troubleshootingNote
-#$AlertDocumentationURL = $AlertWebhook.docURL
-#$ShowDeviceDetails = $AlertWebhook.showDeviceDetails
-#$ShowDeviceStatus = $AlertWebhook.showDeviceStatus
-#$ShowAlertDetails = $AlertWebhook.showAlertDetails
-#$AlertID = $AlertWebhook.alertUID
-#$AlertMessage = $AlertWebhook.alertMessage
-#$DattoPlatform = $AlertWebhook.platform
+$AlertTroubleshooting = $AlertWebhook.troubleshootingNote
+$AlertDocumentationURL = $AlertWebhook.docURL
+$ShowDeviceDetails = $AlertWebhook.showDeviceDetails
+$ShowDeviceStatus = $AlertWebhook.showDeviceStatus
+$ShowAlertDetails = $AlertWebhook.showAlertDetails
+$AlertID = $AlertWebhook.alertUID
+$AlertMessage = $AlertWebhook.alertMessage
+$DattoPlatform = $AlertWebhook.platform
 
-$AlertTroubleshooting = 'Example Note'
-$AlertDocumentationURL = 'https://docs.example.com'
-$ShowDeviceDetails = $true
-$ShowDeviceStatus = $true
-$ShowAlertDetails = $true
-$AlertID = 'e01e5dbb-6bc4-427c-b1f6-4106797af0ad'
-$AlertMessage = '[Failure Test Monitor] - Result: A Test Alert Was Created'
-$DattoPlatform = 'merlot'
+
 
 
 $AlertTypesLookup = @{
@@ -197,9 +191,7 @@ if ($Alert) {
 
 
     # Handle reoccurring alerts
-    if ($ReoccuringAlerts) {
-        # Child Tickets [{"id":40935,"parent_id":"40936"},{"id":40934,"parent_id":"40936"},{"id":40279,"parent_id":"40936"}]
-        
+    if ($ReoccuringAlerts) {        
         $ReoccuringAlertParent = $ReoccuringAlerts | Sort-Object FaultID | Select-Object -First 1
                 
         if ($ReoccuringAlertParent.ParentID) {
@@ -207,9 +199,6 @@ if ($Alert) {
         } else {
             $ParentID = $ReoccuringAlertParent.FaultID
         }
-
-        #[{"id":"40936","files":null,"status_id":"2","attachments":[],"utcoffset":-60,"_refreshresponse":true,"apply_rules":true}]
-        
         
         $RecurringUpdate = @{
             id = $ParentID
@@ -221,7 +210,6 @@ if ($Alert) {
         $HaloTicketCreate.add('parent_id', $ParentID)
         
     } elseif ($RelatedAlerts) {
-        # Relate to another ticket [{"id":"40936","_refreshresponse":true,"createdfrom_id":40934}]
         $RelatedAlertsParent = $RelatedAlerts | Sort-Object FaultID | Select-Object -First 1
 
         if ($RelatedAlertsParent.RelatedID -ne 0) {
@@ -237,8 +225,6 @@ if ($Alert) {
 
      
     $Ticket = New-HaloTicket -Ticket $HaloTicketCreate
-
-    # [{"ticket_id":"40942","action_isresponse":true,"validate_response":true,"sendemail":false,"_forcereassign":true,"_includeticketinresponse":true}
 
     $ActionUpdate = @{
         id                = 1
