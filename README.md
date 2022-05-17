@@ -16,6 +16,7 @@ Once you have created the custom field we need to create two custom reports in H
 
 ##### DattoRMMAlerts:
 ```
+/****** Script for SelectTopNRows command from SSMS  ******/
 SELECT TOP (1000) [Faultid]
       ,[Symptom]
       ,[tstatusdesc]
@@ -23,9 +24,11 @@ SELECT TOP (1000) [Faultid]
       ,[inventorynumber]
       ,[FGFIAlertType]
       ,[CFDattoAlertType]
+      ,[fxrefto] as ParentID
+      ,[fcreatedfromid] as RelatedID
   FROM [HaloPSA].[dbo].[FAULTS]
   inner join TSTATUS on Status = Tstatus
-  Where CFDattoAlertType is not null
+  Where CFDattoAlertType is not null and fdeleted <> 1
   ```
 
   ##### DattoRMMDeviceLookup:
@@ -40,7 +43,7 @@ SELECT TOP (1000) [Faultid]
 ### Webhook
 ```
 {
-    "alertTroubleshooting": "Please run scandisk and then consult the documentation with the view docs link",
+    "troubleshootingNote": "Please run scandisk and then consult the documentation with the view docs link",
     "docURL": "https://docs.yourdomain.com/alert-specific-kb-article",
     "showDeviceDetails": true,
     "showDeviceStatus": true,
