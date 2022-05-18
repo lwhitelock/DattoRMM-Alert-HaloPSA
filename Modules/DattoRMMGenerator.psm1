@@ -62,23 +62,6 @@ function Get-DRMMAlertDetailsSection {
             <h3>Troubleshooting:</h3>
             <p style="margin: 0 0 10px;">$($AlertTroubleshooting)</p>
             <br />
-            <h3>Device Details:</h3>
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-                                style="font-size: 14px; text-align: left;">
-                                <tr>
-                                    <td style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff; padding-top: 10px;"
-                                        class="stack-column-center">
-                                        <ul>
-                                            <li>Device name: <strong>$($Device.hostname)</strong></li>
-                                            <li>Site: <strong>$($Device.siteName)</strong></li>
-                                            <li>User: <strong>$($Device.lastLoggedInUser)</strong></li>
-                                            <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
-                                            <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>
-                                            <li>External IP: <strong>$($Device.extIpAddress)</strong></li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
         </td>
     </tr>
 
@@ -160,12 +143,6 @@ function Get-DRMMDeviceDetailsSection {
                                             <li>Device name: <strong>$($Device.hostname)</strong></li>
                                             <li>Site: <strong>$($Device.siteName)</strong></li>
                                             <li>User: <strong>$($Device.lastLoggedInUser)</strong></li>
-    
-                                        </ul>
-                                    </td>
-                                    <td style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff; padding-top: 10px;"
-                                        class="stack-column-center">
-                                        <ul>
                                             <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00';
                                                     $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
                                             <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>

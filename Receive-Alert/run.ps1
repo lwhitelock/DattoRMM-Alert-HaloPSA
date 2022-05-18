@@ -15,7 +15,7 @@ $HaloClientID = $env:HaloClientID
 $HaloClientSecret = $env:HaloClientSecret
 $HaloURL = $env:HaloURL
 
-$NumberOfColumns = 3
+$NumberOfColumns = 2
 $HaloTicketStatusID = 2
 $SetTicketResponded = $True
 
