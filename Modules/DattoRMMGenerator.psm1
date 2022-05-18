@@ -336,7 +336,7 @@ function Get-DRMMAlertHistorySection {
     $HTMLOpenAlerts = $ParsedOpenAlerts | Sort-Object Created -desc | convertto-html -Fragment
     $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
 
-    $DeviceResolvedAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
+    $ParsedResolvedAlerts = $DeviceResolvedAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
     @{n = 'Priority'; e = { $_.priority } },
     @{n = 'Created'; e = { $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp)) } },
     @{n = 'Type'; e = { $AlertTypesLookup[$_.alertContext.'@class'] } },
