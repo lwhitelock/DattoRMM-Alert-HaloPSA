@@ -5,15 +5,11 @@ param($Request, $TriggerMetadata)
 
 Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
 
-$DattoURL = $env:DattoURL
-$DattoKey = $env:DattoKey
-$DattoSecretKey = $env:DattoSecretKey
-
 $HaloClientID = $env:HaloClientID
 $HaloClientSecret = $env:HaloClientSecret
 $HaloURL = $env:HaloURL
 
-$NumberOfColumns = 2
+
 $HaloTicketStatusID = 2
 $SetTicketResponded = $True
 
@@ -21,29 +17,13 @@ $SetTicketResponded = $True
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 5
 
-# Creates a child ticket in Halo off the main ticket if it reocures with the specified number of hours.
+# Creates a child ticket in Halo off the main ticket if it reocurrs with the specified number of hours.
 $ReoccurringTicketHours = 24
-
 $HaloReocurringStatus = 35
-
 $HaloAlertHistoryDays = 90
 
-#$HaloCustomAlertTypeField = 252
-#$HaloDattoRMMDeviceLookup = 222
-#$HaloDattoRMMAlerts = 221
-#$HaloTicketType = 24
-
 $HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
-$HaloDattoRMMDeviceLookup = $env:HaloDattoRMMDeviceLookup
-$HaloDattoRMMAlerts = $env:HaloDattoRMMAlerts
 $HaloTicketType = $env:HaloTicketType
-
-#$CPUUDF = '29'
-#$RAMUDF = '30'
-
-$CPUUDF = $env:CPUUDF
-$RAMUDF = $env:RAMUDF
-
 
 
 $PriorityHaloMap = @{
@@ -54,46 +34,37 @@ $PriorityHaloMap = @{
     "Information" = "4"
 }
 
-
-#$AlertTroubleshooting = 'Example Note'
-#$AlertDocumentationURL = 'https://docs.example.com'
-#$ShowDeviceDetails = $true
-#$ShowDeviceStatus = $true
-#$ShowAlertDetails = $true
-#$AlertID = 'e01e5dbb-6bc4-427c-b1f6-4106797af0ad'
-#$AlertMessage = '[Failure Test Monitor] - Result: A Test Alert Was Created'
-#$DattoPlatform = 'merlot'
-
 $AlertWebhook = $Request.Body
 
 
 $Email = Get-AlertEmailBody -AlertWebhook $AlertWebhook
+
 if ($Email) {
     $Alert = $Email.Alert
 
     Connect-HaloAPI -URL $HaloURL -ClientId $HaloClientID -ClientSecret $HaloClientSecret -Scopes "all"
     
     $HaloDeviceReport = @{
-		name                    = "Datto RMM Improved Alerts PowerShell Function - Device Report"
-		sql                     = "Select did, Dsite, DDattoID, DDattoAlternateId from device"
-		description             = "This report is used to quickly obtain device mapping information for use with the improved Datto RMM Alerts Function"
-		type                    = 0
-		datasource_id           = 0
-		canbeaccessedbyallusers = $false
-	}
+        name                    = "Datto RMM Improved Alerts PowerShell Function - Device Report"
+        sql                     = "Select did, Dsite, DDattoID, DDattoAlternateId from device"
+        description             = "This report is used to quickly obtain device mapping information for use with the improved Datto RMM Alerts Function"
+        type                    = 0
+        datasource_id           = 0
+        canbeaccessedbyallusers = $false
+    }
 
     $ParsedAlertType = Get-AlertHaloType -Alert $Alert -AlertMessage $AlertWebhook.alertMessage
 
     $HaloDevice = Invoke-HaloReport -Report $HaloDeviceReport -IncludeReport | where-object { $_.DDattoID -eq $Alert.alertSourceInfo.deviceUid }
 
     $HaloAlertsReportBase = @{
-		name                    = "Datto RMM Improved Alerts PowerShell Function - Alerts Report"
-		sql                     = "SELECT Faultid, Symptom, tstatusdesc, dateoccured, inventorynumber, FGFIAlertType, CFDattoAlertType, fxrefto as ParentID, fcreatedfromid as RelatedID FROM FAULTS inner join TSTATUS on Status = Tstatus Where CFDattoAlertType is not null and fdeleted <> 1"
-		description             = "This report is used to quickly obtain alert information for use with the improved Datto RMM Alerts Function"
-		type                    = 0
-		datasource_id           = 0
-		canbeaccessedbyallusers = $false
-	}
+        name                    = "Datto RMM Improved Alerts PowerShell Function - Alerts Report"
+        sql                     = "SELECT Faultid, Symptom, tstatusdesc, dateoccured, inventorynumber, FGFIAlertType, CFDattoAlertType, fxrefto as ParentID, fcreatedfromid as RelatedID FROM FAULTS inner join TSTATUS on Status = Tstatus Where CFDattoAlertType is not null and fdeleted <> 1"
+        description             = "This report is used to quickly obtain alert information for use with the improved Datto RMM Alerts Function"
+        type                    = 0
+        datasource_id           = 0
+        canbeaccessedbyallusers = $false
+    }
 
     $HaloAlertsReport = Invoke-HaloReport -Report $HaloAlertsReportBase
 

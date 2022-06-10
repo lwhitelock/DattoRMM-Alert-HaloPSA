@@ -301,6 +301,15 @@ function Get-HTMLBody {
 }
 
 Function Get-AlertEmailBody($AlertWebhook) {
+    $DattoURL = $env:DattoURL
+    $DattoKey = $env:DattoKey
+    $DattoSecretKey = $env:DattoSecretKey
+
+    $CPUUDF = $env:CPUUDF
+    $RAMUDF = $env:RAMUDF
+
+    $NumberOfColumns = $env:NumberOfColumns
+
     $AlertTroubleshooting = $AlertWebhook.troubleshootingNote
     $AlertDocumentationURL = $AlertWebhook.docURL
     $ShowDeviceDetails = $AlertWebhook.showDeviceDetails
