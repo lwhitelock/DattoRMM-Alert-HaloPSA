@@ -300,3 +300,83 @@ function Get-HTMLBody {
 
 }
 
+Function Get-AlertEmailBody($AlertWebhook) {
+    $AlertTroubleshooting = $AlertWebhook.troubleshootingNote
+    $AlertDocumentationURL = $AlertWebhook.docURL
+    $ShowDeviceDetails = $AlertWebhook.showDeviceDetails
+    $ShowDeviceStatus = $AlertWebhook.showDeviceStatus
+    $ShowAlertDetails = $AlertWebhook.showAlertDetails
+    $AlertID = $AlertWebhook.alertUID
+    $AlertMessage = $AlertWebhook.alertMessage
+    $DattoPlatform = $AlertWebhook.platform
+
+
+
+
+    $AlertTypesLookup = @{
+        perf_resource_usage_ctx   = 'Resource Monitor'
+        comp_script_ctx           = 'Component Monitor'
+        perf_mon_ctx              = 'Performance Monitor'
+        online_offline_status_ctx = 'Offline'
+        eventlog_ctx              = 'Event Log'
+        perf_disk_usage_ctx       = 'Disk Usage'
+        patch_ctx                 = 'Patch Monitor'
+        srvc_status_ctx           = 'Service Status'
+        antivirus_ctx             = 'Antivirus'
+        custom_snmp_ctx           = 'SNMP'
+    }
+
+
+
+    $params = @{
+        Url       = $DattoURL
+        Key       = $DattoKey
+        SecretKey = $DattoSecretKey
+    }
+
+    Set-DrmmApiParameters @params
+
+    $Alert = Get-DrmmAlert -alertUid $AlertID
+
+    if ($Alert) {
+        [System.Collections.Generic.List[PSCustomObject]]$Sections = @()
+
+        $Device = Get-DrmmDevice -deviceUid $Alert.alertSourceInfo.deviceUid
+        $DeviceAudit = Get-DrmmAuditDevice -deviceUid $Alert.alertSourceInfo.deviceUid
+
+        # Build the alert details section
+        Get-DRMMAlertDetailsSection -Sections $Sections -Alert $Alert -Device $Device -AlertDocumentationURL $AlertDocumentationURL -AlertTroubleshooting $AlertTroubleshooting -DattoPlatform $DattoPlatform
+
+
+        ## Build the device details section if enabled.
+        if ($ShowDeviceDetails -eq $True) {
+            Get-DRMMDeviceDetailsSection -Sections $Sections -Device $Device
+        }
+
+
+        # Build the device status section if enabled
+        if ($ShowDeviceStatus -eq $true) {
+            Get-DRMMDeviceStatusSection -Sections $Sections -Device $Device -DeviceAudit $DeviceAudit -CPUUDF $CPUUDF -RAMUDF $RAMUDF
+        }
+
+
+        if ($showAlertDetails -eq $true) {
+            Get-DRMMAlertHistorySection -Sections $Sections -Alert $Alert -DattoPlatform $DattoPlatform
+        }
+
+        $TicketSubject = "Alert: $($AlertTypesLookup[$Alert.alertContext.'@class']) - $($AlertMessage) on device: $($Device.hostname)"
+
+        $HTMLBody = Get-HTMLBody -Sections $Sections -NumberOfColumns $NumberOfColumns
+    
+        $Email = @{
+            Subject = $TicketSubject
+            Body    = $HTMLBody
+            Alert = $Alert
+        }
+
+        Return $Email
+
+    } else {
+        Return $Null
+    }
+}
