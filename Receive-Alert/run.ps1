@@ -9,21 +9,22 @@ $HaloClientID = $env:HaloClientID
 $HaloClientSecret = $env:HaloClientSecret
 $HaloURL = $env:HaloURL
 
+$HaloTicketStatusID = $env:HaloTicketStatusID
+$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
+$HaloTicketType = $env:HaloTicketType
+$HaloReocurringStatus = $env:HaloReocurringStatus
 
-$HaloTicketStatusID = 2
+# Set if the ticket will be marked as responded in Halo
 $SetTicketResponded = $True
-
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 5
 
 # Creates a child ticket in Halo off the main ticket if it reocurrs with the specified number of hours.
 $ReoccurringTicketHours = 24
-$HaloReocurringStatus = 35
+
 $HaloAlertHistoryDays = 90
 
-$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
-$HaloTicketType = $env:HaloTicketType
 
 
 $PriorityHaloMap = @{
