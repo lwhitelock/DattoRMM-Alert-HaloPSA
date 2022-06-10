@@ -101,7 +101,7 @@
             }
         },
         "GitHubRepositoryURL": {
-            "defaultValue": "https://github.com/lwhitelock/HuduM365Automation.git",
+            "defaultValue": "https://github.com/lwhitelock/DattoRMM-Alert-HaloPSA.git",
             "type": "string",
             "metadata": {
                 "description": "If you have forked the repository enter the link to your fork here"
