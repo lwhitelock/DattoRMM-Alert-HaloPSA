@@ -2,7 +2,10 @@
 Takes Datto RMM Alert Webhooks and sends them to Halo PSA
 
 ## Setup
-#### Halo Custom field
+### Make a fork
+I highly recommend you make a fork of this repository. When you click the deploy button it will ask you for the repository to deploy from, so you can easily paste in your own. You can still deploy from my respository, but I have built this function to be more of a starting point for you to extend it yourself to get the data you want to make resolving alerts quicker for your team.
+
+### Halo Custom field
 Create a custom field on tickets in Halo with these details:
 Field Name: DattoAlertType
 Field Label: Datto RMM Alert Type
