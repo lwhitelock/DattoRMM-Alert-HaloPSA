@@ -389,3 +389,53 @@ Function Get-AlertEmailBody($AlertWebhook) {
         Return $Null
     }
 }
+
+
+Function Get-AlertSummary($AlertWebhook) {
+    $DattoURL = $env:DattoURL
+    $DattoKey = $env:DattoKey
+    $DattoSecretKey = $env:DattoSecretKey
+
+    $AlertID = $AlertWebhook.alertUID
+    
+    $AlertTypesLookup = @{
+        perf_resource_usage_ctx   = 'Resource Monitor'
+        comp_script_ctx           = 'Component Monitor'
+        perf_mon_ctx              = 'Performance Monitor'
+        online_offline_status_ctx = 'Offline'
+        eventlog_ctx              = 'Event Log'
+        perf_disk_usage_ctx       = 'Disk Usage'
+        patch_ctx                 = 'Patch Monitor'
+        srvc_status_ctx           = 'Service Status'
+        antivirus_ctx             = 'Antivirus'
+        custom_snmp_ctx           = 'SNMP'
+    }
+
+    $params = @{
+        Url       = $DattoURL
+        Key       = $DattoKey
+        SecretKey = $DattoSecretKey
+    }
+
+    Set-DrmmApiParameters @params
+
+    $Alert = Get-DrmmAlert -alertUid $AlertID
+
+    if ($Alert) {
+        
+        $Device = Get-DrmmDevice -deviceUid $Alert.alertSourceInfo.deviceUid
+        
+        $TicketSubject = "Alert: $($AlertTypesLookup[$Alert.alertContext.'@class'])"
+
+        $Summary = @{
+            Subject = $TicketSubject
+            Alert = $Alert
+            Device = $Device
+        }
+
+        Return $Summary
+
+    } else {
+        Return $Null
+    }
+}
