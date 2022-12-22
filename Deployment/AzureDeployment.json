@@ -79,6 +79,13 @@
                 "description": "The ID of the status you want tickets to be set to after creation"
             }
         },
+        "HaloTicketCloseStatusID": {
+            "defaultValue": "9",
+            "type": "string",
+            "metadata": {
+                "description": "The ID of the status you want tickets to be set to after close"
+            }
+        },
         "HaloCustomAlertTypeField": {
             "defaultValue": "252",
             "type": "string",
