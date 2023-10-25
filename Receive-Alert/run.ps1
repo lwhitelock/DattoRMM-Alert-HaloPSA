@@ -35,7 +35,7 @@ $PriorityHaloMap = @{
     "Information" = "4"
 }
 
-$AlertWebhook = $Request.Body | ConvertTo-Json
+$AlertWebhook = $Request.Body | ConvertTo-Json -Depth 100
 
 $Request.Body -replace '\\u0026', '&' -replace '\\u0027', "'" -replace '\\u003c', '<' -replace '\\u003e', '>'
 
