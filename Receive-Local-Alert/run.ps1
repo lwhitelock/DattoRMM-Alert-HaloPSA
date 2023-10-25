@@ -3,16 +3,20 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
+Write-Host "Output of Request sent >>> $($Request)"
+Write-Output "-----------------------------------------------------------------"
 Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
+Write-Output "-----------------------------------------------------------------"
+Write-Output "-----------------------------------------------------------------"
 
-$HaloClientID = $env:HaloClientID
-$HaloClientSecret = $env:HaloClientSecret
-$HaloURL = $env:HaloURL
+$HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
+$HaloClientSecret = "4cda3fbe-b9ce-45e1-87df-7f15c206df35-3c2098ad-f262-4019-aced-476459e4f56b"
+$HaloURL = "https://alphascan.halopsa.com/"
 
-$HaloTicketStatusID = $env:HaloTicketStatusID
-$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
-$HaloTicketType = $env:HaloTicketType
-$HaloReocurringStatus = $env:HaloReocurringStatus
+$HaloTicketStatusID = 1
+$HaloCustomAlertTypeField = 202
+$HaloTicketType = 21
+$HaloReocurringStatus = 30
 
 # Set if the ticket will be marked as responded in Halo
 $SetTicketResponded = $True
@@ -25,8 +29,6 @@ $ReoccurringTicketHours = 24
 
 $HaloAlertHistoryDays = 90
 
-
-
 $PriorityHaloMap = @{
     "Critical"    = "1"
     "High"        = "2"
@@ -35,15 +37,20 @@ $PriorityHaloMap = @{
     "Information" = "4"
 }
 
-$AlertWebhook = $Request.Body -replace '&amp;','&'
+Write-Host "Output of Request.Body >>> $($Request.Body)"
+Write-Output "-----------------------------------------------------------------"
+Write-Host "Output of Request.Body.alertUID >>> $($Request.Body.alertUID)"
+Write-Output "-----------------------------------------------------------------"
+Write-Host "Output of Request.Body (Post Conversion) >>> $($Request.Body)"
+Write-Output "-----------------------------------------------------------------"
 
-$a = [pscustomobject] @{
-  connectionStrings = [pscustomobject] @{
-    serverstring = $Request.Body
-  }
-} 
+$AlertWebhook = $Request.Body # | ConvertTo-Json -Depth 100
 
-($a | ConvertTo-Json -Compress) -replace '\\u0026', '&'
+Write-Host "Output of AlertWebhook >>> $AlertWebhook"
+Write-Output "-----------------------------------------------------------------"
+Write-Host "Output of AlertWebhook.alertUID >>> $($AlertWebhook.alertUID)"
+Write-Output "-----------------------------------------------------------------"
+Write-Host "Output of Request.Body.alertUID >>> $($Request.Body.alertUID)"
 
 $Email = Get-AlertEmailBody -AlertWebhook $AlertWebhook
 
@@ -183,7 +190,7 @@ if ($Email) {
     
 
 } else {
-    Write-Host "No alert found"
+    Write-Error "No alert found"
 }
 
 
