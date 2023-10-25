@@ -345,7 +345,7 @@ Function Get-AlertEmailBody($AlertWebhook) {
 
     Set-DrmmApiParameters @params
 
-    $Alert = Get-DrmmAlert -alertUid $AlertID
+    $Alert = Get-DrmmAlert -alertUID $AlertID
 
     if ($Alert) {
         [System.Collections.Generic.List[PSCustomObject]]$Sections = @()
