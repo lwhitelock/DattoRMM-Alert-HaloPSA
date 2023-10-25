@@ -35,15 +35,9 @@ $PriorityHaloMap = @{
     "Information" = "4"
 }
 
-$AlertWebhook = $Request.Body -replace '&amp;','&'
+$AlertWebhook = $Request.Body | ConvertTo-Json
 
-$a = [pscustomobject] @{
-  connectionStrings = [pscustomobject] @{
-    serverstring = $Request.Body
-  }
-} 
-
-($a | ConvertTo-Json) -replace '\\u0026', '&'
+$Request.Body -replace '\\u0026', '&' -replace '\\u0027', "'" -replace '\\u003c', '<' -replace '\\u003e', '>'
 
 $Email = Get-AlertEmailBody -AlertWebhook $AlertWebhook
 
