@@ -1,4 +1,3 @@
-
 function Get-MapColour {
     param (
         $MapList,
@@ -74,7 +73,6 @@ function Get-HeatMap {
     return $html
 }
 
-
 function Get-DecodedTable {
     param(
         $TableString,
@@ -143,7 +141,6 @@ function Get-AlertHaloType {
     
 }
 
-
 function Get-HTMLBody {
     param (
         $Sections,
@@ -208,7 +205,6 @@ function Get-HTMLBody {
 <!-- Footer HTML End -->
 "@
 
-
     $RowHeader = @"
 <!-- Row Header HTML Start -->
 <div class="row row-responsive" style="margin-right: -24px;">
@@ -227,7 +223,6 @@ function Get-HTMLBody {
 <!-- Row Footer HTML End -->
 "@
 
-
     $CurrentColumn = 1
     $CalculatedWidth = 100 / $NumberOfColumns
     $SectionCount = 1
@@ -241,7 +236,6 @@ function Get-HTMLBody {
         }
 
         Write-Host "$CurrentColumn"
-
 
         $Block = @"
     <!-- Block HTML Start -->
@@ -297,7 +291,6 @@ function Get-HTMLBody {
 
     return $HTML
 
-
 }
 
 Function Get-AlertEmailBody($AlertWebhook) {
@@ -319,9 +312,6 @@ Function Get-AlertEmailBody($AlertWebhook) {
     $AlertMessage = $AlertWebhook.alertMessage
     $DattoPlatform = $AlertWebhook.platform
 
-
-
-
     $AlertTypesLookup = @{
         perf_resource_usage_ctx   = 'Resource Monitor'
         comp_script_ctx           = 'Component Monitor'
@@ -334,8 +324,6 @@ Function Get-AlertEmailBody($AlertWebhook) {
         antivirus_ctx             = 'Antivirus'
         custom_snmp_ctx           = 'SNMP'
     }
-
-
 
     $params = @{
         Url       = $DattoURL
@@ -356,18 +344,15 @@ Function Get-AlertEmailBody($AlertWebhook) {
         # Build the alert details section
         Get-DRMMAlertDetailsSection -Sections $Sections -Alert $Alert -Device $Device -AlertDocumentationURL $AlertDocumentationURL -AlertTroubleshooting $AlertTroubleshooting -DattoPlatform $DattoPlatform
 
-
         ## Build the device details section if enabled.
         if ($ShowDeviceDetails -eq $True) {
             Get-DRMMDeviceDetailsSection -Sections $Sections -Device $Device
         }
 
-
         # Build the device status section if enabled
         if ($ShowDeviceStatus -eq $true) {
             Get-DRMMDeviceStatusSection -Sections $Sections -Device $Device -DeviceAudit $DeviceAudit -CPUUDF $CPUUDF -RAMUDF $RAMUDF
         }
-
 
         if ($showAlertDetails -eq $true) {
             Get-DRMMAlertHistorySection -Sections $Sections -Alert $Alert -DattoPlatform $DattoPlatform
