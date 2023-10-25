@@ -3,7 +3,7 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
-Write-Host "Processing Webhook for Alert $($Request.Body.alertUID)"
+Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID) -"
 
 $HaloClientID = $env:HaloClientID
 $HaloClientSecret = $env:HaloClientSecret
