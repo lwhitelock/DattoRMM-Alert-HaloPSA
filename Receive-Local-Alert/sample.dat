@@ -1,0 +1,9 @@
+{
+    "troubleshootingNote": "TO BE UPDATED",
+    "showDeviceDetails": true,
+    "showDeviceStatus": true,
+    "showAlertDetails": true,
+    "alertUID": "5a38c0de-dc7c-4b13-b125-a4cfee0bfb1a",
+    "alertMessage": "Process 'AGMService' isRunning",
+    "platform": "Pinotage"
+}
