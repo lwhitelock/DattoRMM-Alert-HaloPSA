@@ -53,13 +53,14 @@ function Get-DRMMAlertDetailsSection {
         <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff;">
             <h1
                 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; font-weight: normal; $Colour">
-                $($Alert.priority) Alert - $($Device.siteName) - $($Device.hostname)</h1>
-            <h3>Component Monitor - [Failure Test Monitor] - Result: A Test Alert Was Created:</h3>
+                $($Alert.priority) Alert - ($($Device.siteName)) - $($Device.hostname)</h1>
+            <h3>$($Alertwebhook.alertmessage):</h3>
+            <h4>Diagnostic Information:</h4>
             <p style="margin: 0 0 10px;">$(Get-AlertDescription -Alert $Alert)
             $($Alert.diagnostics)
             </p>
             <br />
-            <h3>Troubleshooting:</h3>
+            <h3>Troubleshooting Note:</h3>
             <p style="margin: 0 0 10px;">$($AlertTroubleshooting)</p>
             <br />
         </td>
@@ -78,24 +79,9 @@ function Get-DRMMAlertDetailsSection {
             <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
                 class="stack-column">
                 <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform)rmm.centrastage.net/device/$($Device.id)/$($Device.hostname)"
-                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
-                    Device</a>
-            </div>
-            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                class="stack-column">
-                <a class="button-a button-a-primary" target="_blank"
                     href="https://$($DattoPlatform)rmm.centrastage.net/site/$($Device.siteId)"
                     style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
                     Site</a>
-            </div>
-            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                class="stack-column">
-                <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform).centrastage.net/csm/remote/rto/$($Device.id)"
-                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
-                    Remote</a>
-            </div>
         </td>
     </tr>
 
@@ -105,7 +91,7 @@ function Get-DRMMAlertDetailsSection {
 
 
     $AlertDetailsSection = @{
-        Heading = "Alert Details"
+        Heading = "RMM Alert Details"
         HTML    = $SectionHTML
     }
 
@@ -140,14 +126,29 @@ function Get-DRMMDeviceDetailsSection {
                                     <td style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff; padding-top: 10px;"
                                         class="stack-column-center">
                                         <ul>
-                                            <li>Device name: <strong>$($Device.hostname)</strong></li>
-                                            <li>Site: <strong>$($Device.siteName)</strong></li>
-                                            <li>User: <strong>$($Device.lastLoggedInUser)</strong></li>
+                                            <li>RMM Device Name: <strong>$($Device.hostname)</strong></li>
+                                            <li>RMM Site: <strong>$($Device.siteName)</strong></li>
+                                            <li>Last Logged in User: <strong>$($Device.lastLoggedInUser)</strong></li>
                                             <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00';
                                                     $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
                                             <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>
                                             <li>External IP: <strong>$($Device.extIpAddress)</strong></li>
                                         </ul>
+                                        <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+                                        class="stack-column">
+                                        <a class="button-a button-a-primary" target="_blank"
+                                            href="https://$($DattoPlatform)rmm.centrastage.net/device/$($Device.id)/$($Device.hostname)"
+                                            style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
+                                            Device</a>
+                                        </div>
+                                        </div>
+                                        <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+                                            class="stack-column">
+                                            <a class="button-a button-a-primary" target="_blank"
+                                                href="https://$($DattoPlatform).centrastage.net/csm/remote/rto/$($Device.id)"
+                                                style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
+                                                Remote</a>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -161,7 +162,7 @@ function Get-DRMMDeviceDetailsSection {
 "@
 
     $DeviceDetailsSection = @{
-        Heading = "Device Details"
+        Heading = "RMM Device Details"
         HTML    = $DeviceDetailsHtml
     }
 
@@ -266,7 +267,7 @@ function Get-DRMMDeviceStatusSection {
 "@
 
     $DeviceStatusSection = @{
-        Heading = "Device Status"
+        Heading = "RMM Device Status"
         HTML    = $DeviceStatusHTML
     }
 
@@ -336,20 +337,11 @@ function Get-DRMMAlertHistorySection {
             <br />
         </td>
     </tr>
-    <tr>
-            <tr>
-                <td
-                    style="text-align: center; padding-bottom: 40px; font-family: sans-serif; font-size: 15px; color: #ffffff;">
-                    <h2>Alert Heatmap for device</h2>
-                    $($HTMLHeatmapTable)
-                </td>
-            </tr>
-    </tr>
     <!-- Alert Details : END -->
 "@
     
     $AlertHistorySection = @{
-        Heading = "Alert History"
+        Heading = "RMM Alert History"
         HTML    = $AlertHistoryHTML
     }
     

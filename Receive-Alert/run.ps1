@@ -25,8 +25,6 @@ $ReoccurringTicketHours = 24
 
 $HaloAlertHistoryDays = 90
 
-
-
 $PriorityHaloMap = @{
     "Critical"    = "1"
     "High"        = "2"
