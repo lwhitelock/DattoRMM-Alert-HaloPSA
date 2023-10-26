@@ -110,7 +110,6 @@ function Get-DRMMDeviceDetailsSection {
         $Sections
     )
 
-
     $DeviceDetailsHtml = @"
     <!-- Device Details HTML Start -->
     <tr>
