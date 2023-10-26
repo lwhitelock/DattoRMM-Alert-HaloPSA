@@ -45,7 +45,7 @@ function Get-DRMMAlertDetailsSection {
         $DocLinkHTML = ''
     }
     
-    $Colour = Get-DRMMAlertColour -Piority $Alert.Priority
+    $Colour = Get-DRMMAlertColour -Priority $Alert.Priority
 
     $SectionHTML = @"
     <!-- Alert Detaills HTML Start -->
@@ -54,7 +54,8 @@ function Get-DRMMAlertDetailsSection {
             <h1
                 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; font-weight: normal; $Colour">
                 $($Alert.priority) Alert - ($($Device.siteName)) - $($Device.hostname)</h1>
-            <h3>$($Alertwebhook.alertmessage):</h3>
+            <h4>$($AlertMessage)</h4>
+            <br />
             <h4>Diagnostic Information:</h4>
             <p style="margin: 0 0 10px;">$(Get-AlertDescription -Alert $Alert)
             $($Alert.diagnostics)
@@ -133,27 +134,27 @@ function Get-DRMMDeviceDetailsSection {
                                             <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>
                                             <li>External IP: <strong>$($Device.extIpAddress)</strong></li>
                                         </ul>
-                                        <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                                        class="stack-column">
-                                        <a class="button-a button-a-primary" target="_blank"
-                                            href="https://$($DattoPlatform)rmm.centrastage.net/device/$($Device.id)/$($Device.hostname)"
-                                            style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
-                                            Device</a>
-                                        </div>
-                                        </div>
-                                        <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                                            class="stack-column">
-                                            <a class="button-a button-a-primary" target="_blank"
-                                                href="https://$($DattoPlatform).centrastage.net/csm/remote/rto/$($Device.id)"
-                                                style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
-                                                Remote</a>
-                                        </div>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
                 </table>
+            </div>
+            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+            class="stack-column">
+            <a class="button-a button-a-primary" target="_blank"
+                href="https://$($DattoPlatform)rmm.centrastage.net/device/$($Device.id)/$($Device.hostname)"
+                style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
+                Device</a>
+            </div>
+            </div>
+            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+                class="stack-column">
+                <a class="button-a button-a-primary" target="_blank"
+                    href="https://$($DattoPlatform).centrastage.net/csm/remote/rto/$($Device.id)"
+                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
+                    Remote</a>
             </div>
         </td>
     </tr>
