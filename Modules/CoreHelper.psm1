@@ -109,6 +109,7 @@ function Get-AlertDescription {
         'srvc_status_ctx' { $Result = "$($AlertContext.serviceName) - $($AlertContext.status)" }
         'antivirus_ctx' { $Result = "$($AlertContext.productName) - $($AlertContext.status)" }
         'custom_snmp_ctx' { $Result = "$($AlertContext.displayName) - $($AlertContext.currentValue)" }
+        'process_status_ctx' { $Result = "$($AlertContext.processName) - $($AlertContext.status)" }
         default { $Result = "Unknown Monitor Type" }
     }
 
@@ -134,6 +135,7 @@ function Get-AlertHaloType {
         'srvc_status_ctx' { $Result = "Service Alert - $($AlertContext.serviceName)" }
         'antivirus_ctx' { $Result = "Anti Virus Alert $($AlertContext.productName)" }
         'custom_snmp_ctx' { $Result = "SNMP Alert - $($AlertContext.displayName)" }
+        'process_status_ctx' { $Result = "Process Status Alert - $($AlertContext.displayName)" }
         default { $Result = "Unknown Monitor Type" }
     }
     
@@ -294,14 +296,15 @@ function Get-HTMLBody {
 }
 
 Function Get-AlertEmailBody($AlertWebhook) {
-    $DattoURL = $env:DattoURL
-    $DattoKey = $env:DattoKey
-    $DattoSecretKey = $env:DattoSecretKey
 
-    $CPUUDF = $env:CPUUDF
-    $RAMUDF = $env:RAMUDF
+    $DattoURL = "https://pinotage-api.centrastage.net"
+    $DattoKey = "BJMS7L11CTJ6D894JGU2MEJALS7JN24O"
+    $DattoSecretKey = "L6QV2DUJ7LS0QNBG3025KJU3H0OFLGOA"
 
-    $NumberOfColumns = $env:NumberOfColumns
+    $CPUUDF = 29
+    $RAMUDF = 30
+
+    $NumberOfColumns = 1
 
     $AlertTroubleshooting = $AlertWebhook.troubleshootingNote
     $AlertDocumentationURL = $AlertWebhook.docURL
@@ -323,6 +326,7 @@ Function Get-AlertEmailBody($AlertWebhook) {
         srvc_status_ctx           = 'Service Status'
         antivirus_ctx             = 'Antivirus'
         custom_snmp_ctx           = 'SNMP'
+        process_status_ctx        = 'Process Status'
     }
 
     $params = @{
@@ -333,7 +337,7 @@ Function Get-AlertEmailBody($AlertWebhook) {
 
     Set-DrmmApiParameters @params
 
-    $Alert = Get-DrmmAlert -alertUID $AlertID
+    $Alert = Get-DrmmAlert -alertUid $AlertID
 
     if ($Alert) {
         [System.Collections.Generic.List[PSCustomObject]]$Sections = @()

@@ -1,18 +1,20 @@
 using namespace System.Net
 
-# Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
-Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID) -"
+$FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
-$HaloClientID = $env:HaloClientID
-$HaloClientSecret = $env:HaloClientSecret
-$HaloURL = $env:HaloURL
+Write-Host "Full Request = $FullRequest"
+Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
-$HaloTicketStatusID = $env:HaloTicketStatusID
-$HaloCustomAlertTypeField = $env:HaloCustomAlertTypeField
-$HaloTicketType = $env:HaloTicketType
-$HaloReocurringStatus = $env:HaloReocurringStatus
+$HaloClientID = "4f8d1c05-6b4d-45a4-bacc-b3edfa164efc"
+$HaloClientSecret = "4e82f0d3-baa5-4c71-8786-f25e1d2a7688-15e32490-ef19-4356-a653-6a4875d4b66d"
+$HaloURL = "https://alphascan.halopsa.com:443/"
+
+$HaloTicketStatusID = 1
+$HaloCustomAlertTypeField = 202
+$HaloTicketType = 21
+$HaloReocurringStatus = 30
 
 # Set if the ticket will be marked as responded in Halo
 $SetTicketResponded = $True
@@ -33,9 +35,9 @@ $PriorityHaloMap = @{
     "Information" = "4"
 }
 
-$AlertWebhook = $Request.Body # | ConvertTo-Json -Depth 100
+$AlertWebhook = $FullRequest | ConvertTo-Json
 
-$Email = Get-AlertEmailBody -AlertWebhook $AlertWebhook
+$Email = Get-AlertEmailBody -AlertWebhook $FullRequest
 
 if ($Email) {
     $Alert = $Email.Alert
@@ -115,7 +117,6 @@ if ($Email) {
         )
     }
 
-
     # Handle reoccurring alerts
     if ($ReoccuringAlerts) {        
         $ReoccuringAlertParent = $ReoccuringAlerts | Sort-Object FaultID | Select-Object -First 1
@@ -148,8 +149,6 @@ if ($Email) {
 
     } 
 
-
-     
     $Ticket = New-HaloTicket -Ticket $HaloTicketCreate
 
     $ActionUpdate = @{
@@ -170,13 +169,10 @@ if ($Email) {
         }
         $Null = New-HaloAction -Action $ActionResolveUpdate
     }
-    
 
 } else {
     Write-Host "No alert found"
 }
-
-
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{

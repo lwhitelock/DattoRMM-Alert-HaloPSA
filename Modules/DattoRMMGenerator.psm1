@@ -100,8 +100,6 @@ function Get-DRMMAlertDetailsSection {
 
 }
 
-
-
 function Get-DRMMDeviceDetailsSection {
     <#
     This function returns the HTML for the device details section.
@@ -184,8 +182,8 @@ function Get-DRMMDeviceStatusSection {
     )
 
     # Generate CPU/ RAM Use Data
-    $CPUData = $Device.udf."udf$CPUUDF" #| convertfrom-json
-    $RAMData = $Device.udf."udf$RAMUDF" #| convertfrom-json
+    $CPUData = $Device.udf."udf$CPUUDF" | ConvertFrom-Json
+    $RAMData = $Device.udf."udf$RAMUDF" | ConvertFrom-Json
 
     $CPUUse = $CPUData.T
     $RAMUse = $RAMData.T
