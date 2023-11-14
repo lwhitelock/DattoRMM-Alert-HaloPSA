@@ -1,10 +1,10 @@
 using namespace System.Net
 
+# Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
 $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
-Write-Host "Full Request = $FullRequest"
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
 $HaloClientID = "4f8d1c05-6b4d-45a4-bacc-b3edfa164efc"
@@ -13,11 +13,12 @@ $HaloURL = "https://alphascan.halopsa.com:443/"
 
 $HaloTicketStatusID = 1
 $HaloCustomAlertTypeField = 202
+$HaloCustomAlertIDField = 210 
 $HaloTicketType = 21
 $HaloReocurringStatus = 30
 
 # Set if the ticket will be marked as responded in Halo
-$SetTicketResponded = $True
+$SetTicketResponded = $false
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 5
@@ -113,6 +114,10 @@ if ($Email) {
             @{
                 id    = $HaloCustomAlertTypeField
                 value = $ParsedAlertType
+            }
+            @{
+                id = $HaloCustomAlertIDField
+                value = $AlertID
             }
         )
     }
