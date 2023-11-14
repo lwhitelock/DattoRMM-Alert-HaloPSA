@@ -7,8 +7,8 @@ $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
-$HaloClientID = "4f8d1c05-6b4d-45a4-bacc-b3edfa164efc"
-$HaloClientSecret = "4e82f0d3-baa5-4c71-8786-f25e1d2a7688-15e32490-ef19-4356-a653-6a4875d4b66d"
+$HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
+$HaloClientSecret = "8a6bc9cd-6d66-4500-8a7e-c77c55456b97-fa283f4a-133c-40f4-9326-d0f2ee0fb88c"
 $HaloURL = "https://alphascan.halopsa.com:443/"
 
 $HaloTicketStatusID = 1
