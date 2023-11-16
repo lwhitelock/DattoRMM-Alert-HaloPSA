@@ -5,17 +5,24 @@ param($Request, $TriggerMetadata)
 
 $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
+<# $Full Request contents (for testing)
+@{
+    alertMessage        = "Process 'AdobeARMservice' isStopped" 
+    showDeviceDetails   = "True"
+    platform            = "Pinotage"
+    alertUID            = "b1e3fba7-dfa8-480d-91a5-6e589a69c6d0" 
+    docURL              = "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/"
+    showAlertDetails    = "True"
+    showDeviceStatus    = "True"
+    troubleshootingNote = "Please check the system uptime, if excessive, advise the user to reboot the device."
+}
+#>
+
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
 $HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
 $HaloClientSecret = "8a6bc9cd-6d66-4500-8a7e-c77c55456b97-fa283f4a-133c-40f4-9326-d0f2ee0fb88c"
 $HaloURL = "https://alphascan.halopsa.com:443/"
-
-$HaloTicketStatusID = 1
-$HaloCustomAlertTypeField = 202
-$HaloCustomAlertIDField = 210 
-$HaloTicketType = 21
-$HaloReocurringStatus = 30
 
 # Set if the ticket will be marked as responded in Halo
 $SetTicketResponded = $false
@@ -24,7 +31,7 @@ $SetTicketResponded = $false
 $RelatedAlertMinutes = 5
 
 # Creates a child ticket in Halo off the main ticket if it reocurrs with the specified number of hours.
-$ReoccurringTicketHours = 24
+$ReoccurringTicketHours = 2
 
 $HaloAlertHistoryDays = 90
 
@@ -47,7 +54,7 @@ if ($Email) {
     
     $HaloDeviceReport = @{
         name                    = "Datto RMM Improved Alerts PowerShell Function - Device Report"
-        sql                     = "Select did, Dsite, DDattoID, DDattoAlternateId from device"
+        sql                     = "Select did, Dsite, DDattoID, DDattoAlternateId, dinvno, dtype from device"
         description             = "This report is used to quickly obtain device mapping information for use with the improved Datto RMM Alerts Function"
         type                    = 0
         datasource_id           = 0
@@ -60,7 +67,7 @@ if ($Email) {
 
     $HaloAlertsReportBase = @{
         name                    = "Datto RMM Improved Alerts PowerShell Function - Alerts Report"
-        sql                     = "SELECT Faultid, Symptom, tstatusdesc, dateoccured, inventorynumber, FGFIAlertType, CFDattoAlertType, fxrefto as ParentID, fcreatedfromid as RelatedID FROM FAULTS inner join TSTATUS on Status = Tstatus Where CFDattoAlertType is not null and fdeleted <> 1"
+        sql                     = "SELECT Faultid, Symptom, tstatusdesc, dateoccured, inventorynumber, CFDattoAlertType, fxrefto as ParentID, fcreatedfromid as RelatedID FROM FAULTS inner join TSTATUS on Status = Tstatus Where CFDattoAlertType is not null and fdeleted <> 1"
         description             = "This report is used to quickly obtain alert information for use with the improved Datto RMM Alerts Function"
         type                    = 0
         datasource_id           = 0
@@ -101,23 +108,21 @@ if ($Email) {
 
     $HaloTicketCreate = @{
         summary          = $TicketSubject
-        tickettype_id    = $HaloTicketType
+        tickettype_id    = 21
         inventory_number = $HaloDevice.did
         details_html     = $HtmlBody
-        gfialerttype     = $AlertID
-        DattoAlertState = 0
         site_id          = $HaloDevice.dsite
         assets           = @(@{id = $HaloDevice.did })
         priority_id      = $HaloPriority
-        status_id        = $HaloTicketStatusID
+        status_id        = 1
         customfields     = @(
             @{
-                id    = $HaloCustomAlertTypeField
-                value = $ParsedAlertType
+                id       = 202
+                value    = $ParsedAlertType
             }
             @{
-                id = $HaloCustomAlertIDField
-                value = $AlertID
+                id       = 210
+                value    = $FullRequest.alertUID
             }
         )
     }
@@ -134,7 +139,7 @@ if ($Email) {
         
         $RecurringUpdate = @{
             id        = $ParentID
-            status_id = $HaloReocurringStatus   
+            status_id = 30
         }
 
         $null = Set-HaloTicket -Ticket $RecurringUpdate
