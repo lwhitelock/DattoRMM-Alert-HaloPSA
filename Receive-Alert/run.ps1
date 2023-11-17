@@ -10,11 +10,13 @@ $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
     alertMessage        = "Process 'AdobeARMservice' isStopped" 
     showDeviceDetails   = "True"
     platform            = "Pinotage"
-    alertUID            = "b1e3fba7-dfa8-480d-91a5-6e589a69c6d0" 
+    alertUID            = "a4052d47-5e01-4c50-b746-9e8998e8ce4f" 
     docURL              = "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/"
     showAlertDetails    = "True"
     showDeviceStatus    = "True"
     troubleshootingNote = "Please check the system uptime, if excessive, advise the user to reboot the device."
+    lastuser            = "ALPHASCANjacob.newman"
+    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22635"
 }
 #>
 
@@ -28,10 +30,10 @@ $HaloURL = "https://alphascan.halopsa.com:443/"
 $SetTicketResponded = $false
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
-$RelatedAlertMinutes = 5
+$RelatedAlertMinutes = 15
 
 # Creates a child ticket in Halo off the main ticket if it reocurrs with the specified number of hours.
-$ReoccurringTicketHours = 2
+$ReoccurringTicketHours = 3
 
 $HaloAlertHistoryDays = 90
 
@@ -58,12 +60,12 @@ if ($Email) {
         description             = "This report is used to quickly obtain device mapping information for use with the improved Datto RMM Alerts Function"
         type                    = 0
         datasource_id           = 0
-        canbeaccessedbyallusers = $false
+        canbeaccessedbyallusers = $true
     }
 
     $ParsedAlertType = Get-AlertHaloType -Alert $Alert -AlertMessage $AlertWebhook.alertMessage
 
-    $HaloDevice = Invoke-HaloReport -Report $HaloDeviceReport -IncludeReport | where-object { $_.DDattoID -eq $Alert.alertSourceInfo.deviceUid }
+    $HaloDevice = Invoke-HaloReport -Report $HaloDeviceReport -IncludeReport | Where-Object { $_.DDattoID -eq $Alert.alertSourceInfo.deviceUid }
 
     $HaloAlertsReportBase = @{
         name                    = "Datto RMM Improved Alerts PowerShell Function - Alerts Report"
@@ -80,25 +82,28 @@ if ($Email) {
         id                       = $HaloAlertsReport.id
         filters                  = @(
             @{
-                fieldname      = 'inventorynumber'
-                stringruletype = 2
-                stringruletext = "$($HaloDevice.did)"
+                fieldname        = 'inventorynumber'
+                stringruletype   = 2
+                stringruletext   = "$($HaloDevice.dinvno)"
             }
         )
-        _loadreportonly          = $true
-        reportingperiodstartdate = get-date(((Get-date).ToUniversalTime()).adddays(-$HaloAlertHistoryDays)) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
-        reportingperiodenddate   = get-date((Get-date -Hour 23 -Minute 59 -second 59).ToUniversalTime()) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
+        reportingperiodstartdate = Get-Date(((Get-Date).ToUniversalTime()).adddays(-$HaloAlertHistoryDays)) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
+        reportingperiodenddate   = Get-Date((Get-Date -Hour 23 -Minute 59 -second 59).ToUniversalTime()) -UFormat '+%Y-%m-%dT%H:%M:%SZ'
         reportingperioddatefield = "dateoccured"
         reportingperiod          = "7"
     }
 
-    $ReportResults = (Set-HaloReport -Report $AlertReportFilter).report.rows
+    Set-HaloReport -Report $AlertReportFilter
 
-    $ReoccuringHistory = $ReportResults | where-object { $_.CFDattoAlertType -eq $ParsedAlertType } 
+    $GetReportResults = Get-HaloReport -ReportID $AlertReportFilter.id -IncludeDetails -LoadReport
+
+    $ReportResults = $GetReportResults.report.rows
+
+    $ReoccuringHistory = $ReportResults | Where-Object -Filter { $_.CFDattoAlertType -eq $ParsedAlertType }
     
-    $ReoccuringAlerts = $ReoccuringHistory | where-object { $_.dateoccured -gt ((Get-Date).addhours(-$ReoccurringTicketHours)) }
+    $ReoccuringAlerts = $ReoccuringHistory | Where-Object { $_.dateoccured -gt ((Get-Date).addhours(-$ReoccurringTicketHours)) }
 
-    $RelatedAlerts = $ReportResults | where-object { $_.dateoccured -gt ((Get-Date).addminutes(-$RelatedAlertMinutes)).ToUniversalTime() -and $_.CFDattoAlertType -ne $ParsedAlertType }
+    $RelatedAlerts = $ReportResults | Where-Object { $_.dateoccured -gt ((Get-Date).addminutes(-$RelatedAlertMinutes)).ToUniversalTime() -and $_.CFDattoAlertType -ne $ParsedAlertType }
         
     $TicketSubject = $Email.Subject
 
