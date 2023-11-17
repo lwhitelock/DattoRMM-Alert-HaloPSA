@@ -290,36 +290,35 @@ function Get-DRMMAlertHistorySection {
     $DeviceOpenAlerts = Get-DrmmDeviceOpenAlerts -deviceUid $Alert.alertSourceInfo.deviceUid
     $DeviceResolvedAlerts = Get-DrmmDeviceResolvedAlerts -deviceUid $Alert.alertSourceInfo.deviceUid
 
-    $DeviceOpenAlerts | foreach-object { $null = $AllAlerts.add($_) }
-    $DeviceResolvedAlerts | foreach-object { $null = $AllAlerts.add($_) }
+    $DeviceOpenAlerts | ForEach-Object { $null = $AllAlerts.add($_) }
+    $DeviceResolvedAlerts | ForEach-Object { $null = $AllAlerts.add($_) }
 
-    # $XValues = @("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23")
-    # $YValues = @("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    $XValues = @("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23")
+    $YValues = @("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
-    # $AlertDates = $AllAlerts.timestamp | Foreach-Object { [datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_) }
+    $AlertDates = $AllAlerts.timestamp | Foreach-Object { [datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_) }
 
-    # $ParsedDates = $AlertDates | ForEach-Object { "$($_.dayofweek)$($_.hour)" }
+    $ParsedDates = $AlertDates | ForEach-Object { "$($_.dayofweek)$($_.hour)" }
 
-    # $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
-
+    $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
 
     $ParsedOpenAlerts = $DeviceOpenAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://pinotage.rmm.datto.com/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
     @{n = 'Priority'; e = { $_.priority } },
     @{n = 'Created'; e = { $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp)) } },
-    @{n = 'Type'; e = { $AlertTypesLookup[$_.alertContext.'@class'] } },
+    @{n = 'Type'; e = { $AlertTypesLookup[$Alert.alertContext.'@class'] } },
     @{n = 'Description'; e = { Get-AlertDescription -Alert $_ } }
 
-    $HTMLOpenAlerts = $ParsedOpenAlerts | Sort-Object Created -desc | convertto-html -Fragment
-    $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
+    $HTMLOpenAlerts = $ParsedOpenAlerts | Sort-Object Created -Descending | ConvertTo-Html -Fragment
+    $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -Replace '<table>', $AlertsTableStyle) -Replace '<td>', $AlertsTableTDStyle))
 
-    $ParsedResolvedAlerts = $DeviceResolvedAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://pinotage.rmm.datto.com/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
+    $ParsedResolvedAlerts = $DeviceResolvedAlerts | Select-Object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://pinotage.rmm.datto.com/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
     @{n = 'Priority'; e = { $_.priority } },
     @{n = 'Created'; e = { $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp)) } },
-    @{n = 'Type'; e = { $AlertTypesLookup[$_.alertContext.'@class'] } },
+    @{n = 'Type'; e = { $AlertTypesLookup[$Alert.alertContext.'@class'] } },
     @{n = 'Description'; e = { Get-AlertDescription -Alert $_ } }
 
-    $HTMLResolvedAlerts = $ParsedResolvedAlerts | Sort-Object Created -desc | select-object -first 10 | convertto-html -Fragment
-    $HTMLParsedResolvedAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLResolvedAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
+    $HTMLResolvedAlerts = $ParsedResolvedAlerts | Sort-Object Created -Descending | Select-Object -First 10 | ConvertTo-Html -Fragment
+    $HTMLParsedResolvedAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLResolvedAlerts) -Replace '<table>', $AlertsTableStyle) -Replace '<td>', $AlertsTableTDStyle))
 
     $AlertHistoryHTML = @"
     <!-- Alert Details : BEGIN -->
@@ -327,13 +326,21 @@ function Get-DRMMAlertHistorySection {
         <td
             style="padding: 10px 10px 0px 10px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff;">
             <h3>Open Alerts</h3>
-    
             $($HTMLParsedOpenAlerts)
             <br />
             <h3>Recent Resolved Alerts</h3>
             $($HTMLParsedResolvedAlerts)
             <br />
         </td>
+    </tr>
+    <tr>
+        <tr>
+            <td
+                style="text-align: center; padding-bottom: 40px; font-family: sans-serif; font-size: 15px; color: #ffffff;">
+                <h2>Alert Heatmap for device</h2>
+                $($HTMLHeatmapTable)
+            </td>
+        </tr>
     </tr>
     <!-- Alert Details : END -->
 "@
@@ -344,7 +351,4 @@ function Get-DRMMAlertHistorySection {
     }
     
     $Sections.add($AlertHistorySection)
-    
-
-
 }
