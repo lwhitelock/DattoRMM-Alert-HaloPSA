@@ -7,16 +7,16 @@ $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
 <# $Full Request contents (for testing)
 @{
-    alertMessage        = "Device went Online" 
+    alertMessage        = "C: Drive has 268.8 GB used out of 476.2 GB (56% Used)" 
     showDeviceDetails   = "True"
     platform            = "Pinotage"
-    alertUID            = "6ee18d3b-af49-4a48-8f5b-ce74179f986e" 
+    alertUID            = "f8584511-1cf3-4731-af28-6c6b977fd956"
     docURL              = "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/"
     showAlertDetails    = "True"
     showDeviceStatus    = "True"
     troubleshootingNote = "Please check the system uptime, if excessive, advise the user to reboot the device."
-    lastuser            = "ALPHASCANlloyd.northover"
-    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22621"
+    lastuser            = "ALPHASCANjacob.newman"
+    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22635"
 }
 #>
 
@@ -27,7 +27,7 @@ $HaloClientSecret = "55a5a6eb-e692-4887-a855-ae7aeeb75efa-5989db99-7622-4c22-ac7
 $HaloURL = "https://alphascan.halopsa.com:443/"
 
 # Set if the ticket will be marked as responded in Halo
-$SetTicketResponded = $false
+$SetTicketResponded = $true
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 15
