@@ -1,6 +1,10 @@
 {
   "version": "2.0",
   "logging": {
+    "logLevel": {
+      "Function.Receive-Alert": "Debug",
+      "default": "Trace"
+    },
     "applicationInsights": {
       "samplingSettings": {
         "isEnabled": true,

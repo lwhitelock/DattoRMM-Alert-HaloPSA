@@ -7,23 +7,23 @@ $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
 <# $Full Request contents (for testing)
 @{
-    alertMessage        = "Process 'AdobeARMservice' isStopped" 
+    alertMessage        = "Device went Online" 
     showDeviceDetails   = "True"
     platform            = "Pinotage"
-    alertUID            = "a4052d47-5e01-4c50-b746-9e8998e8ce4f" 
+    alertUID            = "6ee18d3b-af49-4a48-8f5b-ce74179f986e" 
     docURL              = "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/"
     showAlertDetails    = "True"
     showDeviceStatus    = "True"
     troubleshootingNote = "Please check the system uptime, if excessive, advise the user to reboot the device."
-    lastuser            = "ALPHASCANjacob.newman"
-    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22635"
+    lastuser            = "ALPHASCANlloyd.northover"
+    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22621"
 }
 #>
 
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
 $HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
-$HaloClientSecret = "8a6bc9cd-6d66-4500-8a7e-c77c55456b97-fa283f4a-133c-40f4-9326-d0f2ee0fb88c"
+$HaloClientSecret = "55a5a6eb-e692-4887-a855-ae7aeeb75efa-5989db99-7622-4c22-ac79-8ac5131b0683"
 $HaloURL = "https://alphascan.halopsa.com:443/"
 
 # Set if the ticket will be marked as responded in Halo
@@ -93,7 +93,7 @@ if ($Email) {
         reportingperiod          = "7"
     }
 
-    Set-HaloReport -Report $AlertReportFilter
+    Set-HaloReport -Report $AlertReportFilter -InformationAction SilentlyContinue
 
     $GetReportResults = Get-HaloReport -ReportID $AlertReportFilter.id -IncludeDetails -LoadReport
 
