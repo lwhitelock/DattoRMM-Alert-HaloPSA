@@ -23,7 +23,7 @@ $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
 $HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
-$HaloClientSecret = "55a5a6eb-e692-4887-a855-ae7aeeb75efa-5989db99-7622-4c22-ac79-8ac5131b0683"
+$HaloClientSecret = "7442f88a-092b-407b-88b6-0cd17f166fe4-7934ee62-f20a-4a91-971c-66e8fc83c459"
 $HaloURL = "https://alphascan.halopsa.com:443/"
 
 # Set if the ticket will be marked as responded in Halo
