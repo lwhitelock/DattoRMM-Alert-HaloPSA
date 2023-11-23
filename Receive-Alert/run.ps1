@@ -27,7 +27,7 @@ $HaloClientSecret = "7442f88a-092b-407b-88b6-0cd17f166fe4-7934ee62-f20a-4a91-971
 $HaloURL = "https://alphascan.halopsa.com:443/"
 
 # Set if the ticket will be marked as responded in Halo
-$SetTicketResponded = $true
+$SetTicketResponded = $false
 
 # Relates the tickets in Halo if the alerts arrive within x minutes for a device.
 $RelatedAlertMinutes = 15
