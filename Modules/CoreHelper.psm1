@@ -1,4 +1,3 @@
-
 function Get-MapColour {
     param (
         $MapList,
@@ -74,7 +73,6 @@ function Get-HeatMap {
     return $html
 }
 
-
 function Get-DecodedTable {
     param(
         $TableString,
@@ -111,6 +109,7 @@ function Get-AlertDescription {
         'srvc_status_ctx' { $Result = "$($AlertContext.serviceName) - $($AlertContext.status)" }
         'antivirus_ctx' { $Result = "$($AlertContext.productName) - $($AlertContext.status)" }
         'custom_snmp_ctx' { $Result = "$($AlertContext.displayName) - $($AlertContext.currentValue)" }
+        'process_status_ctx' { $Result = "$($AlertContext.processName) - $($AlertContext.status)" }
         default { $Result = "Unknown Monitor Type" }
     }
 
@@ -136,13 +135,13 @@ function Get-AlertHaloType {
         'srvc_status_ctx' { $Result = "Service Alert - $($AlertContext.serviceName)" }
         'antivirus_ctx' { $Result = "Anti Virus Alert $($AlertContext.productName)" }
         'custom_snmp_ctx' { $Result = "SNMP Alert - $($AlertContext.displayName)" }
+        'process_status_ctx' { $Result = "Process Status Alert - $($AlertContext.displayName)" }
         default { $Result = "Unknown Monitor Type" }
     }
     
     return $Result
     
 }
-
 
 function Get-HTMLBody {
     param (
@@ -208,7 +207,6 @@ function Get-HTMLBody {
 <!-- Footer HTML End -->
 "@
 
-
     $RowHeader = @"
 <!-- Row Header HTML Start -->
 <div class="row row-responsive" style="margin-right: -24px;">
@@ -227,7 +225,6 @@ function Get-HTMLBody {
 <!-- Row Footer HTML End -->
 "@
 
-
     $CurrentColumn = 1
     $CalculatedWidth = 100 / $NumberOfColumns
     $SectionCount = 1
@@ -241,7 +238,6 @@ function Get-HTMLBody {
         }
 
         Write-Host "$CurrentColumn"
-
 
         $Block = @"
     <!-- Block HTML Start -->
@@ -297,18 +293,18 @@ function Get-HTMLBody {
 
     return $HTML
 
-
 }
 
 Function Get-AlertEmailBody($AlertWebhook) {
-    $DattoURL = $env:DattoURL
-    $DattoKey = $env:DattoKey
-    $DattoSecretKey = $env:DattoSecretKey
 
-    $CPUUDF = $env:CPUUDF
-    $RAMUDF = $env:RAMUDF
+    $DattoURL = "https://pinotage-api.centrastage.net"
+    $DattoKey = "BJMS7L11CTJ6D894JGU2MEJALS7JN24O"
+    $DattoSecretKey = "L6QV2DUJ7LS0QNBG3025KJU3H0OFLGOA"
 
-    $NumberOfColumns = $env:NumberOfColumns
+    $CPUUDF = 29
+    $RAMUDF = 30
+
+    $NumberOfColumns = 1
 
     $AlertTroubleshooting = $AlertWebhook.troubleshootingNote
     $AlertDocumentationURL = $AlertWebhook.docURL
@@ -318,9 +314,6 @@ Function Get-AlertEmailBody($AlertWebhook) {
     $AlertID = $AlertWebhook.alertUID
     $AlertMessage = $AlertWebhook.alertMessage
     $DattoPlatform = $AlertWebhook.platform
-
-
-
 
     $AlertTypesLookup = @{
         perf_resource_usage_ctx   = 'Resource Monitor'
@@ -333,9 +326,8 @@ Function Get-AlertEmailBody($AlertWebhook) {
         srvc_status_ctx           = 'Service Status'
         antivirus_ctx             = 'Antivirus'
         custom_snmp_ctx           = 'SNMP'
+        process_status_ctx        = 'Process Status'
     }
-
-
 
     $params = @{
         Url       = $DattoURL
@@ -356,18 +348,15 @@ Function Get-AlertEmailBody($AlertWebhook) {
         # Build the alert details section
         Get-DRMMAlertDetailsSection -Sections $Sections -Alert $Alert -Device $Device -AlertDocumentationURL $AlertDocumentationURL -AlertTroubleshooting $AlertTroubleshooting -DattoPlatform $DattoPlatform
 
-
         ## Build the device details section if enabled.
         if ($ShowDeviceDetails -eq $True) {
             Get-DRMMDeviceDetailsSection -Sections $Sections -Device $Device
         }
 
-
         # Build the device status section if enabled
         if ($ShowDeviceStatus -eq $true) {
             Get-DRMMDeviceStatusSection -Sections $Sections -Device $Device -DeviceAudit $DeviceAudit -CPUUDF $CPUUDF -RAMUDF $RAMUDF
         }
-
 
         if ($showAlertDetails -eq $true) {
             Get-DRMMAlertHistorySection -Sections $Sections -Alert $Alert -DattoPlatform $DattoPlatform

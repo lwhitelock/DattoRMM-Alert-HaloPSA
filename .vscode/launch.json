@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Attach to PowerShell Functions",
+            "type": "PowerShell",
+            "request": "attach",
+            "runspaceId": 1,
+            "preLaunchTask": "func: host start",
+        }
+    ]
+}

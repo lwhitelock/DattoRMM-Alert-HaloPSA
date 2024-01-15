@@ -1,0 +1,10 @@
+{
+    "troubleshootingNote": "Please check the system uptime, if excessive, advise the user to reboot the device.",
+    "docURL": "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/",
+    "showDeviceDetails": true,
+    "showDeviceStatus": true,
+    "showAlertDetails": true,
+    "alertUID": "fa9b26c0-3761-4927-9412-e9f4a5db38d1",
+    "alertMessage": "Process 'AdobeARMservice' isStopped",
+    "platform": "Pinotage"
+}

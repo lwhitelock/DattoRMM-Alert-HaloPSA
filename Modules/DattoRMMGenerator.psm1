@@ -45,7 +45,7 @@ function Get-DRMMAlertDetailsSection {
         $DocLinkHTML = ''
     }
     
-    $Colour = Get-DRMMAlertColour -Piority $Alert.Priority
+    $Colour = Get-DRMMAlertColour -Priority $Alert.Priority
 
     $SectionHTML = @"
     <!-- Alert Detaills HTML Start -->
@@ -53,13 +53,15 @@ function Get-DRMMAlertDetailsSection {
         <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff;">
             <h1
                 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; font-weight: normal; $Colour">
-                $($Alert.priority) Alert - $($Device.siteName) - $($Device.hostname)</h1>
-            <h3>Component Monitor - [Failure Test Monitor] - Result: A Test Alert Was Created:</h3>
+                $($Alert.priority) Alert - ($($Device.siteName)) - $($Device.hostname)</h1>
+            <h4>$($AlertMessage)</h4>
+            <br />
+            <h4>Diagnostic Information:</h4>
             <p style="margin: 0 0 10px;">$(Get-AlertDescription -Alert $Alert)
             $($Alert.diagnostics)
             </p>
             <br />
-            <h3>Troubleshooting:</h3>
+            <h3>Troubleshooting Note:</h3>
             <p style="margin: 0 0 10px;">$($AlertTroubleshooting)</p>
             <br />
         </td>
@@ -71,31 +73,16 @@ function Get-DRMMAlertDetailsSection {
             <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
                 class="stack-column">
                 <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform)rmm.centrastage.net/alert/$($Alert.alertUid)"
+                    href="https://pinotage.rmm.datto.com/alert/$($Alert.alertUid)"
                     style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
                     Alert</a>
             </div>
             <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
                 class="stack-column">
                 <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform)rmm.centrastage.net/device/$($Device.id)/$($Device.hostname)"
-                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
-                    Device</a>
-            </div>
-            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                class="stack-column">
-                <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform)rmm.centrastage.net/site/$($Device.siteId)"
+                    href="https://pinotage.rmm.datto.com/site/$($Device.siteId)"
                     style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
                     Site</a>
-            </div>
-            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
-                class="stack-column">
-                <a class="button-a button-a-primary" target="_blank"
-                    href="https://$($DattoPlatform).centrastage.net/csm/remote/rto/$($Device.id)"
-                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
-                    Remote</a>
-            </div>
         </td>
     </tr>
 
@@ -105,15 +92,13 @@ function Get-DRMMAlertDetailsSection {
 
 
     $AlertDetailsSection = @{
-        Heading = "Alert Details"
+        Heading = "RMM Alert Details"
         HTML    = $SectionHTML
     }
 
     $Sections.add($AlertDetailsSection)
 
 }
-
-
 
 function Get-DRMMDeviceDetailsSection {
     <#
@@ -123,7 +108,6 @@ function Get-DRMMDeviceDetailsSection {
         $Device,
         $Sections
     )
-
 
     $DeviceDetailsHtml = @"
     <!-- Device Details HTML Start -->
@@ -140,9 +124,9 @@ function Get-DRMMDeviceDetailsSection {
                                     <td style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff; padding-top: 10px;"
                                         class="stack-column-center">
                                         <ul>
-                                            <li>Device name: <strong>$($Device.hostname)</strong></li>
-                                            <li>Site: <strong>$($Device.siteName)</strong></li>
-                                            <li>User: <strong>$($Device.lastLoggedInUser)</strong></li>
+                                            <li>RMM Device Name: <strong>$($Device.hostname)</strong></li>
+                                            <li>RMM Site: <strong>$($Device.siteName)</strong></li>
+                                            <li>Last Logged in User: <strong>$($Device.lastLoggedInUser)</strong></li>
                                             <li>Last Reboot: <strong>$([datetime]$origin = '1970-01-01 00:00:00';
                                                     $origin.AddMilliSeconds($Device.lastReboot))</strong></li>
                                             <li>Internal IP: <strong>$($Device.intIpAddress)</strong></li>
@@ -155,13 +139,28 @@ function Get-DRMMDeviceDetailsSection {
                     </tr>
                 </table>
             </div>
+            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+            class="stack-column">
+            <a class="button-a button-a-primary" target="_blank"
+                href="https://pinotage.rmm.datto.com/device/$($Device.id)/$($Device.hostname)"
+                style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">View
+                Device</a>
+            </div>
+            </div>
+            <div style="display:inline-block; margin: 2px; max-width: 128px; min-width:100px; vertical-align:top; width:100%;"
+                class="stack-column">
+                <a class="button-a button-a-primary" target="_blank"
+                    href="https://pinotage.centrastage.net/csm/remote/rto/$($Device.id)"
+                    style="background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;">Web
+                    Remote</a>
+            </div>
         </td>
     </tr>
     <!-- Device Details HTML End -->
 "@
 
     $DeviceDetailsSection = @{
-        Heading = "Device Details"
+        Heading = "RMM Device Details"
         HTML    = $DeviceDetailsHtml
     }
 
@@ -183,14 +182,14 @@ function Get-DRMMDeviceStatusSection {
     )
 
     # Generate CPU/ RAM Use Data
-    $CPUData = $Device.udf."udf$CPUUDF" | convertfrom-json
-    $RAMData = $Device.udf."udf$RAMUDF" | convertfrom-json
+    $CPUData = $Device.udf."udf$CPUUDF" | ConvertFrom-Json
+    $RAMData = $Device.udf."udf$RAMUDF" | ConvertFrom-Json
 
     $CPUUse = $CPUData.T
     $RAMUse = $RAMData.T
 
-    $CPUTable = Get-DecodedTable -TableString $CPUData.D -UseValue '%' | convertto-html -Fragment
-    $RAMTable = Get-DecodedTable -TableString $RAMData.D -UseValue 'GBs' | convertto-html -Fragment
+    $CPUTable = Get-DecodedTable -TableString $CPUData.D -UseValue '%' | ConvertTo-Html -Fragment
+    $RAMTable = Get-DecodedTable -TableString $RAMData.D -UseValue 'GBs' | ConvertTo-Html -Fragment
 
     $DiskData = $DeviceAudit.logicalDisks | where-object { $_.freespace }
 
@@ -256,7 +255,7 @@ function Get-DRMMDeviceStatusSection {
                 </table>
             </div>
             <div style="padding: 10px 10px 0px 10px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff;">
-                <h2>Disk Use</h3>
+                <h2>Disk Usage:</h3>
                     $DiskHTML
             </div>
             </td>
@@ -266,7 +265,7 @@ function Get-DRMMDeviceStatusSection {
 "@
 
     $DeviceStatusSection = @{
-        Heading = "Device Status"
+        Heading = "RMM Device Status"
         HTML    = $DeviceStatusHTML
     }
 
@@ -291,8 +290,8 @@ function Get-DRMMAlertHistorySection {
     $DeviceOpenAlerts = Get-DrmmDeviceOpenAlerts -deviceUid $Alert.alertSourceInfo.deviceUid
     $DeviceResolvedAlerts = Get-DrmmDeviceResolvedAlerts -deviceUid $Alert.alertSourceInfo.deviceUid
 
-    $DeviceOpenAlerts | foreach-object { $null = $AllAlerts.add($_) }
-    $DeviceResolvedAlerts | foreach-object { $null = $AllAlerts.add($_) }
+    $DeviceOpenAlerts | ForEach-Object { $null = $AllAlerts.add($_) }
+    $DeviceResolvedAlerts | ForEach-Object { $null = $AllAlerts.add($_) }
 
     $XValues = @("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23")
     $YValues = @("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -303,24 +302,23 @@ function Get-DRMMAlertHistorySection {
 
     $HTMLHeatmapTable = Get-Heatmap -InputData $ParsedDates -XValues $XValues -YValues $YValues
 
-
-    $ParsedOpenAlerts = $DeviceOpenAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
+    $ParsedOpenAlerts = $DeviceOpenAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://pinotage.rmm.datto.com/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
     @{n = 'Priority'; e = { $_.priority } },
     @{n = 'Created'; e = { $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp)) } },
-    @{n = 'Type'; e = { $AlertTypesLookup[$_.alertContext.'@class'] } },
+    @{n = 'Type'; e = { $AlertTypesLookup[$Alert.alertContext.'@class'] } },
     @{n = 'Description'; e = { Get-AlertDescription -Alert $_ } }
 
-    $HTMLOpenAlerts = $ParsedOpenAlerts | Sort-Object Created -desc | convertto-html -Fragment
-    $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
+    $HTMLOpenAlerts = $ParsedOpenAlerts | Sort-Object Created -Descending | ConvertTo-Html -Fragment
+    $HTMLParsedOpenAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLOpenAlerts) -Replace '<table>', $AlertsTableStyle) -Replace '<td>', $AlertsTableTDStyle))
 
-    $ParsedResolvedAlerts = $DeviceResolvedAlerts | select-object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://$($DattoPlatform)rmm.centrastage.net/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
+    $ParsedResolvedAlerts = $DeviceResolvedAlerts | Select-Object @{n = 'View'; e = { "<a class=`"button-a button-a-primary`" target=`"_blank`" href=`"https://pinotage.rmm.datto.com/alert/$($_.alertUid)`" style=`"background: #333333; border: 1px solid #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 4px;`">View</a>" } },
     @{n = 'Priority'; e = { $_.priority } },
     @{n = 'Created'; e = { $([datetime]$origin = '1970-01-01 00:00:00'; $origin.AddMilliSeconds($_.timestamp)) } },
-    @{n = 'Type'; e = { $AlertTypesLookup[$_.alertContext.'@class'] } },
+    @{n = 'Type'; e = { $AlertTypesLookup[$Alert.alertContext.'@class'] } },
     @{n = 'Description'; e = { Get-AlertDescription -Alert $_ } }
 
-    $HTMLResolvedAlerts = $ParsedResolvedAlerts | Sort-Object Created -desc | select-object -first 10 | convertto-html -Fragment
-    $HTMLParsedResolvedAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLResolvedAlerts) -replace '<table>', $AlertsTableStyle) -replace '<td>', $AlertsTableTDStyle))
+    $HTMLResolvedAlerts = $ParsedResolvedAlerts | Sort-Object Created -Descending | Select-Object -First 10 | ConvertTo-Html -Fragment
+    $HTMLParsedResolvedAlerts = [System.Web.HttpUtility]::HtmlDecode(((($HTMLResolvedAlerts) -Replace '<table>', $AlertsTableStyle) -Replace '<td>', $AlertsTableTDStyle))
 
     $AlertHistoryHTML = @"
     <!-- Alert Details : BEGIN -->
@@ -328,7 +326,6 @@ function Get-DRMMAlertHistorySection {
         <td
             style="padding: 10px 10px 0px 10px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #ffffff;">
             <h3>Open Alerts</h3>
-    
             $($HTMLParsedOpenAlerts)
             <br />
             <h3>Recent Resolved Alerts</h3>
@@ -337,24 +334,21 @@ function Get-DRMMAlertHistorySection {
         </td>
     </tr>
     <tr>
-            <tr>
-                <td
-                    style="text-align: center; padding-bottom: 40px; font-family: sans-serif; font-size: 15px; color: #ffffff;">
-                    <h2>Alert Heatmap for device</h2>
-                    $($HTMLHeatmapTable)
-                </td>
-            </tr>
+        <tr>
+            <td
+                style="text-align: center; padding-bottom: 40px; font-family: sans-serif; font-size: 15px; color: #ffffff;">
+                <h2>Alert Heatmap for device</h2>
+                $($HTMLHeatmapTable)
+            </td>
+        </tr>
     </tr>
     <!-- Alert Details : END -->
 "@
     
     $AlertHistorySection = @{
-        Heading = "Alert History"
+        Heading = "RMM Alert History"
         HTML    = $AlertHistoryHTML
     }
     
     $Sections.add($AlertHistorySection)
-    
-
-
 }
