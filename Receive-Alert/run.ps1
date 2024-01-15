@@ -5,26 +5,11 @@ param($Request, $TriggerMetadata)
 
 $FullRequest = $Request.Body | ConvertTo-Json | ConvertFrom-Json
 
-<# $Full Request contents (for testing)
-@{
-    alertMessage        = "C: Drive has 268.8 GB used out of 476.2 GB (56% Used)" 
-    showDeviceDetails   = "True"
-    platform            = "Pinotage"
-    alertUID            = "f8584511-1cf3-4731-af28-6c6b977fd956"
-    docURL              = "https://www.troubleshootingcentral.com/high-memory-usage-on-windows-10-causes-and-fixes/"
-    showAlertDetails    = "True"
-    showDeviceStatus    = "True"
-    troubleshootingNote = "Please check the system uptime, if excessive, advise the user to reboot the device."
-    lastuser            = "ALPHASCANjacob.newman"
-    deviceos            = "Microsoft Windows 11 Enterprise 10.0.22635"
-}
-#>
-
 Write-Host "Processing Webhook for Alert - $($Request.Body.alertUID)"
 
-$HaloClientID = "8f8f6226-2324-4d52-8c06-987c718edaa3"
-$HaloClientSecret = "7442f88a-092b-407b-88b6-0cd17f166fe4-7934ee62-f20a-4a91-971c-66e8fc83c459"
-$HaloURL = "https://alphascan.halopsa.com:443/"
+$HaloClientID = $env:HaloClientID
+$HaloClientSecret = $env:HaloClientSecret
+$HaloURL = $env:HaloURL
 
 # Set if the ticket will be marked as responded in Halo
 $SetTicketResponded = $true
